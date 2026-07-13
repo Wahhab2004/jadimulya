@@ -26,7 +26,7 @@ export default function AdminTopNav({ items }: AdminTopNavProps) {
     <div className="min-w-0 flex-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <nav className="flex min-w-max items-center gap-1 rounded-full border border-emerald-100/80 bg-white/90 p-1 shadow-[0_16px_36px_-26px_rgba(15,23,42,0.28)] backdrop-blur">
         {items.map((item) => {
-          const isActive = pathname === item.href;
+          const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
           const iconKey = item.shortLabel ?? item.label;
 
           return (
