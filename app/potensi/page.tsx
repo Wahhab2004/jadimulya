@@ -1,83 +1,9 @@
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
-
-type PotensiCategory = 'UMKM' | 'Pertanian' | 'Wisata';
-
-type PotensiItem = {
-  id: string;
-  title: string;
-  description: string;
-  category: PotensiCategory;
-  tag: string;
-  actionLabel: string;
-  imageUrl: string;
-};
-
-const potensiItems: PotensiItem[] = [
-  {
-    id: 'p-1',
-    title: 'Anyaman Bambu Kreatif',
-    description:
-      'Produk kerajinan tangan khas Jadimulya yang menggabungkan teknik tradisional dengan desain modern untuk pasar rumah tangga dan suvenir.',
-    category: 'UMKM',
-    tag: 'Produk Unggulan',
-    actionLabel: 'Lihat Produk',
-    imageUrl: '/images/potensi-umkm.jpg',
-  },
-  {
-    id: 'p-2',
-    title: 'Curug Jadimulya Permai',
-    description:
-      'Destinasi alam dengan udara sejuk, aliran air jernih, dan jalur trekking ringan yang cocok untuk wisata keluarga dan komunitas.',
-    category: 'Wisata',
-    tag: 'Destinasi Alam',
-    actionLabel: 'Pesan Tiket',
-    imageUrl: '/images/potensi-wisata.jpg',
-  },
-  {
-    id: 'p-3',
-    title: 'Kopi Robusta Jadimulya',
-    description:
-      'Komoditas kopi robusta dari lereng perbukitan yang diproses petani lokal dengan cita rasa cokelat dan aroma rempah lembut.',
-    category: 'Pertanian',
-    tag: 'Komoditas Organik',
-    actionLabel: 'Beli Online',
-    imageUrl: '/images/potensi-kopi.jpg',
-  },
-  {
-    id: 'p-4',
-    title: 'Batik Tulis Sekar Jagad',
-    description:
-      'Warisan budaya yang dikerjakan kelompok perajin desa dengan motif lokal, pewarna alami, dan sentuhan kontemporer.',
-    category: 'UMKM',
-    tag: 'Warisan Budaya',
-    actionLabel: 'Lihat Koleksi',
-    imageUrl: '/images/potensi-umkm.jpg',
-  },
-  {
-    id: 'p-5',
-    title: 'Sentra Buah Tropis',
-    description:
-      'Kebun buah masyarakat yang menghasilkan manggis, rambutan, dan durian lokal dengan distribusi ke pasar wilayah sekitar.',
-    category: 'Pertanian',
-    tag: 'Hasil Bumi',
-    actionLabel: 'Hubungi Petani',
-    imageUrl: '/images/potensi-wisata.jpg',
-  },
-  {
-    id: 'p-6',
-    title: 'Kampung Kuliner Tradisional',
-    description:
-      'Ragam kuliner khas desa dari resep turun-temurun, disajikan dengan pengalaman makan yang hangat dan otentik.',
-    category: 'Wisata',
-    tag: 'Kuliner Khas',
-    actionLabel: 'Eksplorasi Menu',
-    imageUrl: '/images/potensi-kopi.jpg',
-  },
-];
+import { initialPotensiItems, loadStoredPotensiItems, type PotensiCategory, type PotensiItem } from '@/lib/potensi-store';
 
 const categoryFilters = ['Semua Potensi', 'UMKM', 'Pertanian', 'Wisata'] as const;
 type CategoryFilter = (typeof categoryFilters)[number];
@@ -119,8 +45,13 @@ const cardActionIcons: Record<PotensiCategory, JSX.Element> = {
 };
 
 export default function PotensiPage() {
+  const [potensiItems, setPotensiItems] = useState<PotensiItem[]>(initialPotensiItems);
   const [activeFilter, setActiveFilter] = useState<CategoryFilter>('Semua Potensi');
   const [visibleCount, setVisibleCount] = useState(6);
+
+  useEffect(() => {
+    setPotensiItems(loadStoredPotensiItems());
+  }, []);
 
   const filteredItems = useMemo(() => {
     const base =
@@ -132,7 +63,7 @@ export default function PotensiPage() {
       }
       return a.title.localeCompare(b.title);
     });
-  }, [activeFilter]);
+  }, [activeFilter, potensiItems]);
 
   const visibleItems = filteredItems.slice(0, visibleCount);
   const hasMore = visibleCount < filteredItems.length;
