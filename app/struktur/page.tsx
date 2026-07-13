@@ -110,12 +110,12 @@ export default function StrukturOrganisasiPage() {
         <section className="rounded-[2rem] border border-white/70 bg-white/80 p-6 shadow-[0_22px_44px_-30px_rgba(15,23,42,0.6)] backdrop-blur sm:p-8">
           <div className="flex flex-col gap-8">
             <div className="space-y-3 text-center sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Pemerintah Desa Jadimulya</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Profil Aparatur Desa Jadimulya</p>
               <h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-                Struktur Organisasi Pemerintahan Desa
+                Tim Kerja Pemerintah Desa yang Siap Melayani
               </h1>
               <p className="mx-auto max-w-3xl text-sm text-slate-600 sm:mx-0 sm:text-base">
-                Tampilan kartu dibuat agar nyaman dibaca di semua ukuran layar: satu alur konten, tanpa pembagian level pada mobile, dan tanpa area yang terpotong di laptop.
+                Kenali perangkat desa kami dalam satu tampilan yang rapi, jelas, dan mudah diakses. Setiap peran ditampilkan untuk memudahkan warga menemukan informasi dan layanan yang dibutuhkan.
               </p>
             </div>
 
