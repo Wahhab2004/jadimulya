@@ -164,12 +164,6 @@ function DetailDialog({
 						<div className="mt-4 grid gap-3 text-sm text-slate-700 sm:grid-cols-2">
 							<p className="rounded-xl bg-slate-50 px-3 py-2">
 								<span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-									NIP
-								</span>
-								{member.nip ?? "Belum tersedia"}
-							</p>
-							<p className="rounded-xl bg-slate-50 px-3 py-2">
-								<span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
 									Email
 								</span>
 								{member.contact?.email ?? "Belum tersedia"}
@@ -218,7 +212,10 @@ export default function StrukturOrganisasiPage() {
 	);
 
 	const levelOptions = useMemo(
-		() => [...new Set(teamMembers.map((member) => member.level))].sort((a, b) => a - b),
+		() =>
+			[...new Set(teamMembers.map((member) => member.level))].sort(
+				(a, b) => a - b,
+			),
 		[teamMembers],
 	);
 
@@ -262,22 +259,27 @@ export default function StrukturOrganisasiPage() {
 								Struktur Pemerintahan Desa Jadimulya
 							</p>
 							<h1 className="text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
-								Aparatur Desa yang Responsif, Tertata, dan Mudah Dihubungi
+								Struktur Organisasi dan Tata Kelola Pemerintah Desa
 							</h1>
 							<p className="mx-auto max-w-3xl text-sm text-slate-600 sm:mx-0 sm:text-base">
 								Halaman ini membantu warga mengenali peran, nama pejabat, dan
-								jalur koordinasi pemerintah desa secara cepat. Pilih profil untuk
-								melihat detail kontak dan informasi pendukung layanan.
+								jalur koordinasi pemerintah desa secara cepat. Pilih profil
+								untuk melihat detail kontak dan informasi pendukung layanan.
 							</p>
 						</div>
 
 						<div className="grid gap-3 sm:grid-cols-3">
 							{stats.map((item) => (
-								<div key={item.label} className="rounded-2xl border border-slate-200 bg-white px-4 py-3">
+								<div
+									key={item.label}
+									className="rounded-2xl border border-slate-200 bg-white px-4 py-3"
+								>
 									<p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">
 										{item.label}
 									</p>
-									<p className="mt-1 text-2xl font-semibold text-slate-900">{item.value}</p>
+									<p className="mt-1 text-2xl font-semibold text-slate-900">
+										{item.value}
+									</p>
 								</div>
 							))}
 						</div>
@@ -321,7 +323,7 @@ export default function StrukturOrganisasiPage() {
 									</h2>
 								</div>
 								<div className="mx-auto w-full max-w-sm">
-								<OrgMemberCard member={leader} onSelect={setSelectedMember} />
+									<OrgMemberCard member={leader} onSelect={setSelectedMember} />
 								</div>
 							</div>
 						)}
@@ -355,11 +357,11 @@ export default function StrukturOrganisasiPage() {
 							) : (
 								<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
 									{filteredTeamMembers.map((member) => (
-								<OrgMemberCard
-									key={member.id}
-									member={member}
-									onSelect={setSelectedMember}
-								/>
+										<OrgMemberCard
+											key={member.id}
+											member={member}
+											onSelect={setSelectedMember}
+										/>
 									))}
 								</div>
 							)}

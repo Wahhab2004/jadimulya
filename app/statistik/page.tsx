@@ -87,7 +87,8 @@ export default function StatistikPage() {
           </article>
 
           <article className="rounded-[1.8rem] border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900">Tingkat Pendidikan</h2>
+            {/* Diganti jadi jenis pekerjaan */}
+            <h2 className="text-lg font-semibold text-slate-900">Jenis Pekerjaan</h2>
             <p className="mt-1 text-sm text-slate-500">Persentase penduduk usia di atas 7 tahun</p>
             <div className="mt-5 space-y-4">
               {educationStats.map((item) => (
