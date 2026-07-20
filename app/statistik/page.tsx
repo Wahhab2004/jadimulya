@@ -4,16 +4,148 @@ import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import { initialPopulationDataset, loadStoredPopulationDataset, type PopulationDataset } from '@/lib/population-store';
+import { getDemografiPerDusun, getDemografiRingkasan } from '@/lib/api';
 
 function numberFormat(value: number) {
   return value.toLocaleString('id-ID');
+}
+
+function toSafeNumber(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return Math.max(0, Math.round(value));
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value.replace(/[^\d.-]/g, ''));
+    if (Number.isFinite(parsed)) {
+      return Math.max(0, Math.round(parsed));
+    }
+  }
+
+  return 0;
+}
+
+function getStringField(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return '';
 }
 
 export default function StatistikPage() {
   const [dataset, setDataset] = useState<PopulationDataset>(initialPopulationDataset);
 
   useEffect(() => {
-    setDataset(loadStoredPopulationDataset());
+    const localDataset = loadStoredPopulationDataset();
+    setDataset(localDataset);
+
+    void (async () => {
+      const nextDataset: PopulationDataset = {
+        ...localDataset,
+        dusun: localDataset.dusun,
+        occupations: localDataset.occupations,
+        summary: { ...localDataset.summary },
+      };
+
+      try {
+        const ringkasan = await getDemografiRingkasan();
+        nextDataset.summary = {
+          totalPopulation: toSafeNumber(ringkasan.totalPopulation ?? nextDataset.summary.totalPopulation),
+          households: toSafeNumber(ringkasan.households ?? nextDataset.summary.households),
+          male: toSafeNumber(ringkasan.male ?? nextDataset.summary.male),
+          female: toSafeNumber(ringkasan.female ?? nextDataset.summary.female),
+        };
+
+        const occupationSource =
+          Array.isArray(ringkasan.occupations) && ringkasan.occupations.length > 0
+            ? ringkasan.occupations
+            : Array.isArray(ringkasan.mainOccupations)
+              ? ringkasan.mainOccupations
+              : [];
+
+        const mappedOccupations = occupationSource
+          .map((item, index) => {
+            const label = typeof item?.label === 'string' ? item.label.trim() : '';
+            if (!label) {
+              return null;
+            }
+
+            return {
+              id: `job-api-${index + 1}`,
+              label,
+              value: toSafeNumber(item?.value),
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        if (mappedOccupations.length > 0) {
+          nextDataset.occupations = mappedOccupations;
+        }
+      } catch {
+        // Some deployments have not exposed /demografi/ringkasan yet.
+      }
+
+      try {
+        const perDusun = await getDemografiPerDusun();
+        const mappedDusun = perDusun
+          .map((item, index) => {
+            const asRecord = item as Record<string, unknown>;
+            const name = getStringField(asRecord, ['name', 'dusunName', 'dusun', 'villageName']);
+            if (!name) {
+              return null;
+            }
+
+            const male = toSafeNumber(asRecord.male ?? asRecord.lakiLaki ?? asRecord.totalMale);
+            const female = toSafeNumber(asRecord.female ?? asRecord.perempuan ?? asRecord.totalFemale);
+            const households = toSafeNumber(asRecord.households ?? asRecord.kk ?? asRecord.totalHouseholds);
+
+            return {
+              id: typeof asRecord.id === 'string' && asRecord.id.trim() ? asRecord.id : `dusun-api-${index + 1}`,
+              name,
+              households,
+              male,
+              female,
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        if (mappedDusun.length > 0) {
+          nextDataset.dusun = mappedDusun;
+
+          const totalFromDusun = mappedDusun.reduce(
+            (acc, item) => {
+              acc.households += item.households;
+              acc.male += item.male;
+              acc.female += item.female;
+              acc.totalPopulation += item.male + item.female;
+              return acc;
+            },
+            { totalPopulation: 0, households: 0, male: 0, female: 0 }
+          );
+
+          if (nextDataset.summary.totalPopulation === 0) {
+            nextDataset.summary.totalPopulation = totalFromDusun.totalPopulation;
+          }
+          if (nextDataset.summary.households === 0) {
+            nextDataset.summary.households = totalFromDusun.households;
+          }
+          if (nextDataset.summary.male === 0) {
+            nextDataset.summary.male = totalFromDusun.male;
+          }
+          if (nextDataset.summary.female === 0) {
+            nextDataset.summary.female = totalFromDusun.female;
+          }
+        }
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+
+      setDataset(nextDataset);
+    })();
   }, []);
 
   const maxDusunTotal = useMemo(

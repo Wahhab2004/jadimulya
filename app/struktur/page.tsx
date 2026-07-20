@@ -7,8 +7,30 @@ import Header from '@/app/components/Header';
 import {
   initialOrganisasiMembers,
   loadStoredOrganisasiMembers,
+  type OrganisasiGroup,
   type OrganisasiMember,
 } from '@/lib/organisasi-store';
+import { getOrganisasi, type BackendOrganisasiItem } from '@/lib/api';
+
+function mapTierToGroup(item: BackendOrganisasiItem): OrganisasiGroup {
+  if (item.tier === 'KEPALA_DESA') {
+    return 'kepala-desa';
+  }
+
+  if (item.tier === 'SEKDES_BPD') {
+    return /bpd/i.test(item.position) ? 'ketua-bpd' : 'sekretaris-desa';
+  }
+
+  if (/dusun/i.test(item.position)) {
+    return 'kepala-dusun';
+  }
+
+  if (/staf|operator|admin/i.test(item.position)) {
+    return 'staf';
+  }
+
+  return 'kaur-kasi';
+}
 
 function getInitials(name: string) {
   return name
@@ -86,7 +108,33 @@ export default function StrukturOrganisasiPage() {
   const [selectedMember, setSelectedMember] = useState<OrganisasiMember | null>(null);
 
   useEffect(() => {
-    setMembers(loadStoredOrganisasiMembers());
+    const localMembers = loadStoredOrganisasiMembers();
+    setMembers(localMembers);
+
+    void (async () => {
+      try {
+        const apiMembers = await getOrganisasi();
+        const mappedMembers = apiMembers.map((item) => ({
+          id: item.id,
+          name: item.fullName,
+          position: item.position,
+          group: mapTierToGroup(item),
+          photoUrl: item.photoUrl ?? '',
+          contact: {
+            email: item.email ?? '',
+            phone: item.phone ?? '',
+            whatsapp: item.phone ?? '',
+            facebook: item.facebookUrl ?? '',
+          },
+        } satisfies OrganisasiMember));
+
+        if (mappedMembers.length > 0) {
+          setMembers(mappedMembers);
+        }
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+    })();
   }, []);
 
   const kepalaDesa = useMemo(

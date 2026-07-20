@@ -6,6 +6,7 @@ import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import SectionHeader from '@/app/components/SectionHeader';
 import { initialSejarahContent, loadStoredSejarahContent, type SejarahContent } from '@/lib/sejarah-store';
+import { getSejarahMilestone, getSejarahNarasi } from '@/lib/api';
 
 const daftarIsi = [
   { id: 'asal-usul', label: 'Asal-usul Desa' },
@@ -20,12 +21,69 @@ const liniMasaUtama = [
   { year: 'Kini', label: '5 Dusun Aktif' },
 ];
 
+function pickText(...values: Array<string | undefined>) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return '';
+}
+
 export default function SejarahPage() {
   const [content, setContent] = useState<SejarahContent>(initialSejarahContent);
   const [activeSection, setActiveSection] = useState(daftarIsi[0].id);
 
   useEffect(() => {
-    setContent(loadStoredSejarahContent());
+    const localContent = loadStoredSejarahContent();
+    setContent(localContent);
+
+    void (async () => {
+      try {
+        const [narasiItems, milestoneItems] = await Promise.all([
+          getSejarahNarasi(),
+          getSejarahMilestone(),
+        ]);
+
+        const sortedNarasi = [...narasiItems].sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+        const originParagraphs = sortedNarasi
+          .map((item) => pickText(item.content, item.body, item.description))
+          .filter(Boolean);
+
+        const sortedMilestones = [...milestoneItems].sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+        const milestones = sortedMilestones
+          .map((item) => {
+            const yearValue = pickText(
+              typeof item.year === 'number' ? String(item.year) : item.year,
+              'Kini'
+            );
+            const eventValue = pickText(item.event, item.description, item.content);
+
+            if (!eventValue) {
+              return null;
+            }
+
+            return {
+              year: yearValue,
+              event: eventValue,
+              imageUrl: item.imageUrl ?? undefined,
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        setContent((current) => ({
+          ...current,
+          heroTitle: pickText(sortedNarasi[0]?.title, current.heroTitle),
+          heroDescription:
+            pickText(sortedNarasi[0]?.subtitle, originParagraphs[0], current.heroDescription),
+          originParagraphs: originParagraphs.length > 0 ? originParagraphs : current.originParagraphs,
+          milestones: milestones.length > 0 ? milestones : current.milestones,
+        }));
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+    })();
   }, []);
 
   useEffect(() => {

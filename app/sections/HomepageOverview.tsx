@@ -42,7 +42,7 @@ export default function HomepageOverview({ features, news }: HomepageOverviewPro
           {news.map((article) => (
             <NewsCard
               key={article.id}
-              tag={article.tag}
+              tag={article.category}
               title={article.title}
               date={article.date}
               description={article.description}

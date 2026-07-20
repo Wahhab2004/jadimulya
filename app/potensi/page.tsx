@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import { initialPotensiItems, loadStoredPotensiItems, type PotensiCategory, type PotensiItem } from '@/lib/potensi-store';
+import { getPotensi } from '@/lib/api';
 
 const categoryFilters = ['Semua Potensi', 'Pertanian', 'Wisata'] as const;
 type CategoryFilter = (typeof categoryFilters)[number];
@@ -43,7 +44,30 @@ export default function PotensiPage() {
   const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
-    setPotensiItems(loadStoredPotensiItems());
+    const localItems = loadStoredPotensiItems();
+    setPotensiItems(localItems);
+
+    void (async () => {
+      try {
+        const apiItems = await getPotensi();
+        const mappedItems = apiItems
+          .filter((item) => item.category === 'PERTANIAN' || item.category === 'PARIWISATA')
+          .map((item) => ({
+            id: item.id,
+            title: item.name,
+            description: item.shortDesc,
+            category: item.category === 'PARIWISATA' ? 'Wisata' : 'Pertanian',
+            tag: item.isHighlight ? 'Highlight' : 'Reguler',
+            imageUrl: item.coverImage ?? '/images/potensi-wisata.jpg',
+          } satisfies PotensiItem));
+
+        if (mappedItems.length > 0) {
+          setPotensiItems(mappedItems);
+        }
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+    })();
   }, []);
 
   const filteredItems = useMemo(() => {
