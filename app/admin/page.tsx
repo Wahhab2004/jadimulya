@@ -142,7 +142,7 @@ export default function AdminHomePage() {
           <p className="mt-2 text-sm text-slate-500">Akses cepat ke modul yang paling sering dipakai.</p>
           <div className="mt-5 space-y-3">
             {adminNavItems
-              .filter((item) => item.href !== '/admin')
+              .filter((item) => item.href !== '/admin' && item.enabled)
               .slice(0, 4)
               .map((item) => (
                 <Link

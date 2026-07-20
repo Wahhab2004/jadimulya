@@ -1,31 +1,37 @@
 import SectionHeader from '../components/SectionHeader';
-import type { FeatureItem, NewsItem } from '@/lib/homeData';
+import type { HomepageNewsItem } from '@/lib/homepage-store';
+import type { PotensiItem } from '@/lib/potensi-store';
 import FeatureCard from '../components/FeatureCard';
 import NewsCard from '../components/NewsCard';
 
 type HomepageOverviewProps = {
-  features: FeatureItem[];
-  news: NewsItem[];
+  features: PotensiItem[];
+  news: HomepageNewsItem[];
 };
 
 export default function HomepageOverview({ features, news }: HomepageOverviewProps) {
+  const primaryFeatures = features.slice(0, 2);
+  const tertiaryFeature = features[2];
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionHeader title="Potensi Desa Unggulan" subtitle="Kekayaan alam dan kreativitas warga yang menjadi pilar ekonomi mandiri Desa Jadimulya." linkLabel="Lihat Potensi Lengkap" linkHref="/potensi" />
+      <SectionHeader title="Potensi Desa Unggulan" subtitle="Kekuatan sektor pertanian dan pariwisata sebagai prioritas pengembangan desa." linkLabel="Lihat Potensi Lengkap" linkHref="/potensi" />
       <div className="grid gap-6 xl:grid-cols-[1.5fr_1fr]">
         <div className="grid gap-6">
-          {features.slice(0, 2).map((feature) => (
+          {primaryFeatures.map((feature) => (
             <FeatureCard key={feature.id} category={feature.category} title={feature.title} description={feature.description} imageUrl={feature.imageUrl} />
           ))}
         </div>
         <div className="space-y-6">
-          <FeatureCard category={features[2].category} title={features[2].title} description={features[2].description} imageUrl={features[2].imageUrl} />
+          {tertiaryFeature ? (
+            <FeatureCard category={tertiaryFeature.category} title={tertiaryFeature.title} description={tertiaryFeature.description} imageUrl={tertiaryFeature.imageUrl} />
+          ) : null}
           <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
             <h3 className="text-xl font-semibold text-slate-900">Program Digitalisasi Desa</h3>
-            <p className="mt-4 text-slate-600">Kami menerapkan sistem “Smart Village” untuk mempermudah akses pelayanan publik dan pemasaran produk UMKM desa.</p>
+            <p className="mt-4 text-slate-600">Akses informasi desa dipusatkan dalam portal resmi agar warga mudah menemukan data penting secara cepat.</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a href="#" className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Cek Portal Layanan</a>
-              <a href="#" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">Unduh Katalog Potensi (PDF)</a>
+              <a href="/potensi" className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Jelajahi Potensi Desa</a>
+              <a href="#" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">Unduh Katalog Potensi (PDF/Docs)</a>
             </div>
           </div>
         </div>

@@ -1,26 +1,14 @@
-export const ADMIN_AUTH_COOKIE = 'jadimulya_admin_session';
+export const ADMIN_ACCESS_TOKEN_COOKIE = 'jadimulya_admin_access_token';
+export const ADMIN_REFRESH_TOKEN_COOKIE = 'jadimulya_admin_refresh_token';
 
-const defaultUsername = 'admin';
-const defaultPassword = 'jadimulya2024';
-
-export function getAdminCredentials() {
-  return {
-    username: process.env.ADMIN_USERNAME ?? defaultUsername,
-    password: process.env.ADMIN_PASSWORD ?? defaultPassword,
-  };
+export function getBackendApiBaseUrl() {
+  return (
+    process.env.BACKEND_API_BASE_URL ??
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    'http://localhost:3000/api/v1'
+  );
 }
 
-export function createAdminSessionValue() {
-  const { username } = getAdminCredentials();
-  return `authenticated:${username}`;
-}
-
-export function verifyAdminLogin(username: string, password: string) {
-  const credentials = getAdminCredentials();
-
-  return username === credentials.username && password === credentials.password;
-}
-
-export function isValidAdminSession(value?: string) {
-  return value === createAdminSessionValue();
+export function hasAdminAccessToken(value?: string) {
+  return typeof value === 'string' && value.trim().length > 0;
 }

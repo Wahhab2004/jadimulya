@@ -1,35 +1,119 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
-import { initialPotensiItems, loadStoredPotensiItems, savePotensiItems, type PotensiItem } from '@/lib/potensi-store';
+import { showAdminToast } from '@/lib/admin-toast';
+
+type PotensiItem = {
+  id: string;
+  title: string;
+  description: string;
+  category: 'Pertanian' | 'Wisata';
+  tag: string;
+  imageUrl: string;
+};
+
+type BackendPotential = {
+  id: string;
+  name: string;
+  category: 'PERTANIAN' | 'PARIWISATA' | 'UMKM';
+  shortDesc: string;
+  coverImage: string | null;
+  isHighlight: boolean;
+};
+
+type BackendResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
+
+function mapPotentialToItem(item: BackendPotential): PotensiItem | null {
+  if (item.category === 'UMKM') {
+    return null;
+  }
+
+  return {
+    id: item.id,
+    title: item.name,
+    description: item.shortDesc,
+    category: item.category === 'PARIWISATA' ? 'Wisata' : 'Pertanian',
+    tag: item.isHighlight ? 'Highlight' : 'Reguler',
+    imageUrl: item.coverImage ?? '/images/potensi-kopi.jpg',
+  };
+}
 
 export default function AdminPotensiPage() {
-  const [items, setItems] = useState<PotensiItem[]>(initialPotensiItems);
+  const [items, setItems] = useState<PotensiItem[]>([]);
   const [notice, setNotice] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setItems(loadStoredPotensiItems());
+    void fetchItems();
   }, []);
 
-  useEffect(() => {
-    savePotensiItems(items);
-  }, [items]);
+  async function fetchItems() {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/admin/be/potensi/admin/all', {
+        method: 'GET',
+        cache: 'no-store',
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal mengambil potensi');
+      }
+
+      const payload = (await response.json()) as BackendResponse<BackendPotential[]>;
+      const nextItems = Array.isArray(payload.data)
+        ? payload.data
+            .map((item) => mapPotentialToItem(item))
+            .filter((item): item is PotensiItem => item !== null)
+        : [];
+
+      setItems(nextItems);
+    } catch {
+      const message = 'Tidak bisa memuat data potensi dari backend.';
+      setNotice(message);
+      showAdminToast(message, 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   const summary = useMemo(() => {
     return {
       total: items.length,
-      umkm: items.filter((item) => item.category === 'UMKM').length,
       pertanian: items.filter((item) => item.category === 'Pertanian').length,
       wisata: items.filter((item) => item.category === 'Wisata').length,
     };
   }, [items]);
 
-  function removeItem(itemId: string) {
-    const nextItems = items.filter((item) => item.id !== itemId);
-    setItems(nextItems);
-    savePotensiItems(nextItems);
-    setNotice('Data potensi berhasil dihapus.');
+  async function removeItem(itemId: string) {
+    const confirmed = window.confirm('Hapus data potensi ini? Tindakan ini tidak bisa dibatalkan.');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/be/potensi/admin/${itemId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal menghapus potensi');
+      }
+
+      await fetchItems();
+      const message = 'Data potensi berhasil dihapus.';
+      setNotice(message);
+      showAdminToast(message, 'success');
+    } catch {
+      const message = 'Gagal menghapus data potensi.';
+      setNotice(message);
+      showAdminToast(message, 'error');
+    }
   }
 
   return (
@@ -38,8 +122,8 @@ export default function AdminPotensiPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Modul Potensi</p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-900">Kelola Potensi Desa</h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
-          Modul potensi dibuat lebih sederhana agar mudah dipakai. Tambah dan edit dipindah ke halaman khusus, sehingga
-          halaman utama cukup dipakai untuk melihat ringkasan dan memilih aksi.
+          Tahap MVP difokuskan ke dua kategori aktif: Pertanian dan Pariwisata. Aksi publik diseragamkan menjadi tombol
+          Lihat Detail hingga ada konfirmasi lanjutan dari perangkat desa.
         </p>
         {notice ? <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div> : null}
       </section>
@@ -50,16 +134,17 @@ export default function AdminPotensiPage() {
           <p className="mt-2 text-4xl font-semibold text-slate-900">{summary.total}</p>
         </article>
         <article className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
-          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">UMKM</p>
-          <p className="mt-2 text-4xl font-semibold text-slate-900">{summary.umkm}</p>
-        </article>
-        <article className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Pertanian</p>
           <p className="mt-2 text-4xl font-semibold text-slate-900">{summary.pertanian}</p>
         </article>
         <article className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
           <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Wisata</p>
           <p className="mt-2 text-4xl font-semibold text-slate-900">{summary.wisata}</p>
+        </article>
+        <article className="rounded-[1.6rem] border border-sky-100 bg-sky-50/80 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
+          <p className="text-xs uppercase tracking-[0.14em] text-slate-500">Status Scope</p>
+          <p className="mt-2 text-lg font-semibold text-slate-900">UMKM ditunda</p>
+          <p className="mt-1 text-xs text-slate-600">Masuk Next Phase sesuai PRD.</p>
         </article>
       </section>
 
@@ -91,6 +176,16 @@ export default function AdminPotensiPage() {
           </div>
 
           <div className="mt-6 space-y-4">
+            {isLoading ? (
+              <article className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+                Memuat data potensi...
+              </article>
+            ) : null}
+            {!isLoading && items.length === 0 ? (
+              <article className="rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600">
+                Belum ada data potensi tersedia.
+              </article>
+            ) : null}
             {items.map((item) => (
               <article key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -99,11 +194,13 @@ export default function AdminPotensiPage() {
                     <h4 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h4>
                     <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
                   </div>
-                  <img src={item.imageUrl} alt={item.title} className="h-20 w-28 rounded-2xl object-cover" />
+                  <div className="relative h-20 w-28 overflow-hidden rounded-2xl">
+                    <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="112px" />
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-slate-500">
                   <span className="rounded-full bg-white px-3 py-1">{item.tag}</span>
-                  <span className="rounded-full bg-white px-3 py-1">{item.actionLabel}</span>
+                  <span className="rounded-full bg-sky-50 px-3 py-1 text-sky-700">Aksi Publik: Lihat Detail</span>
                 </div>
                 <div className="mt-4 flex gap-2">
                   <Link href={`/admin/potensi/${item.id}`} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100">

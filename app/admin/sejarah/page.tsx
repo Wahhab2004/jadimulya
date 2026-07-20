@@ -40,13 +40,9 @@ export default function AdminSejarahPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Judul Hero</p>
             <p className="mt-2 text-lg font-semibold text-slate-900">{content.heroTitle}</p>
           </div>
-          <div className="border-b border-slate-200 px-5 py-4 sm:border-b-0 sm:border-r lg:px-6">
+          <div className="px-5 py-4 sm:border-r lg:px-6">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Milestone</p>
             <p className="mt-2 text-3xl font-semibold text-slate-900">{content.milestones.length}</p>
-          </div>
-          <div className="px-5 py-4 lg:px-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Kepala Desa</p>
-            <p className="mt-2 text-3xl font-semibold text-slate-900">{content.kepalaDesa.length}</p>
           </div>
         </div>
 
@@ -88,21 +84,6 @@ export default function AdminSejarahPage() {
             </div>
           </Link>
 
-          <Link href="/admin/sejarah/kepala-desa" className="flex items-start gap-4 px-5 py-4 transition hover:bg-slate-50 lg:px-6">
-            <ModuleIcon tone="amber">
-              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 4.75l5 2.5v4.5c0 3.2-2.1 6.16-5 7.5-2.9-1.34-5-4.3-5-7.5v-4.5z" />
-                <path d="M9.5 11.75l1.75 1.75 3.25-3.5" />
-              </svg>
-            </ModuleIcon>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="text-base font-semibold text-slate-900">Kepala Desa</h3>
-                <span className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{content.kepalaDesa.length} data</span>
-              </div>
-              <p className="mt-1 text-sm text-slate-600">Kelola daftar pimpinan desa dari masa ke masa.</p>
-            </div>
-          </Link>
           </div>
 
           <section className="border-t border-slate-200 px-5 py-5 xl:border-l xl:border-t-0 lg:px-6">
