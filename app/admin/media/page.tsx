@@ -8,7 +8,7 @@ import {
 	isAllowedImageType,
 } from "@/lib/media-store";
 import { showAdminToast } from "@/lib/admin-toast";
-import { buildAdminBeUrl } from "@/lib/admin-api-client";
+import { adminBeFetch, buildAdminBeUrl } from "@/lib/admin-api-client";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 // Bentuk data ini sengaja mengikuti persis model `Media` di Prisma
@@ -35,10 +35,26 @@ type BackendResponse<T> = {
 // NEXT_PUBLIC_BACKEND_URL ke origin backend (mis. https://api.jadimulya.id).
 // Kalau kosong, url dari backend dipakai apa adanya seperti sebelumnya.
 const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
+const API_BASE_ORIGIN = (() => {
+	try {
+		return new URL(buildAdminBeUrl("")).origin;
+	} catch {
+		return "";
+	}
+})();
 
 function resolveMediaUrl(url: string) {
 	if (/^https?:\/\//i.test(url)) return url;
-	return `${BACKEND_ORIGIN}${url}`;
+	if (url.startsWith("/")) {
+		// Keep root-relative upload paths on FE origin; Next rewrite forwards to BE.
+		return url;
+	}
+	const origin = BACKEND_ORIGIN || API_BASE_ORIGIN;
+	if (!origin) {
+		return url;
+	}
+	const normalizedPath = url.startsWith("/") ? url : `/${url}`;
+	return `${origin}${normalizedPath}`;
 }
 
 function formatFileSize(bytes: number) {
@@ -55,10 +71,7 @@ function formatFileSize(bytes: number) {
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-	const res = await fetch(buildAdminBeUrl(path), {
-		cache: "no-store",
-		...options,
-	});
+	const res = await adminBeFetch(path, options);
 	const json = (await res
 		.json()
 		.catch(() => null)) as BackendResponse<T> | null;
@@ -265,6 +278,7 @@ export default function AdminMediaPage() {
 									<Image
 										src={resolveMediaUrl(item.url)}
 										alt={item.fileName}
+										unoptimized
 										fill
 										className="object-cover"
 										sizes="(max-width: 1280px) 50vw, 33vw"

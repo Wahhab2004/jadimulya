@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import {
   ADMIN_ACCESS_TOKEN_COOKIE,
+  ADMIN_CLIENT_ACCESS_TOKEN_COOKIE,
   ADMIN_REFRESH_TOKEN_COOKIE,
   getBackendApiBaseUrl,
 } from '@/lib/admin-auth';
@@ -53,6 +54,14 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
 
       cookies().set(ADMIN_ACCESS_TOKEN_COOKIE, accessToken, {
         httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+        maxAge: 60 * 60,
+      });
+
+      cookies().set(ADMIN_CLIENT_ACCESS_TOKEN_COOKIE, accessToken, {
+        httpOnly: false,
         sameSite: 'lax',
         secure: process.env.NODE_ENV === 'production',
         path: '/',

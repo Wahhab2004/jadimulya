@@ -1,5 +1,6 @@
 export const ADMIN_ACCESS_TOKEN_COOKIE = 'jadimulya_admin_access_token';
 export const ADMIN_REFRESH_TOKEN_COOKIE = 'jadimulya_admin_refresh_token';
+export const ADMIN_CLIENT_ACCESS_TOKEN_COOKIE = 'jadimulya_admin_access_token_client';
 
 export function getBackendApiBaseUrl() {
   return (

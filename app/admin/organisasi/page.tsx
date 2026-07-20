@@ -7,7 +7,7 @@ import {
   type OrganisasiMember,
 } from '@/lib/organisasi-store';
 import { showAdminToast } from '@/lib/admin-toast';
-import { buildAdminBeUrl } from '@/lib/admin-api-client';
+import { adminBeFetch } from '@/lib/admin-api-client';
 
 type OrganisasiFormState = Omit<OrganisasiMember, 'id'>;
 
@@ -131,9 +131,8 @@ export default function AdminOrganisasiPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(buildAdminBeUrl('organisasi/admin/all'), {
+      const response = await adminBeFetch('organisasi/admin/all', {
         method: 'GET',
-        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -202,13 +201,11 @@ export default function AdminOrganisasiPage() {
       facebookUrl: normalizeUrl(form.contact.facebook ?? ''),
     };
 
-    const endpoint = editingId
-      ? buildAdminBeUrl(`organisasi/admin/${editingId}`)
-      : buildAdminBeUrl('organisasi/admin');
+    const path = editingId ? `organisasi/admin/${editingId}` : 'organisasi/admin';
     const method = editingId ? 'PATCH' : 'POST';
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await adminBeFetch(path, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -256,7 +253,7 @@ export default function AdminOrganisasiPage() {
     }
 
     try {
-      const response = await fetch(buildAdminBeUrl(`organisasi/admin/${id}`), {
+      const response = await adminBeFetch(`organisasi/admin/${id}`, {
         method: 'DELETE',
       });
 

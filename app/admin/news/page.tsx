@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { showAdminToast } from '@/lib/admin-toast';
-import { buildAdminBeUrl } from '@/lib/admin-api-client';
+import { adminBeFetch } from '@/lib/admin-api-client';
 
 type NewsCategory = 'PEMBANGUNAN' | 'KESEHATAN' | 'PERTANIAN' | 'WISATA' | 'LAINNYA';
 
@@ -88,9 +88,8 @@ export default function AdminNewsPage() {
   async function loadNews() {
     setIsLoading(true);
     try {
-      const response = await fetch(buildAdminBeUrl('news/admin/all'), {
+      const response = await adminBeFetch('news/admin/all', {
         method: 'GET',
-        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -138,11 +137,11 @@ export default function AdminNewsPage() {
     }
 
     setIsSaving(true);
-    const endpoint = editingId ? buildAdminBeUrl(`news/admin/${editingId}`) : buildAdminBeUrl('news/admin');
+    const path = editingId ? `news/admin/${editingId}` : 'news/admin';
     const method = editingId ? 'PATCH' : 'POST';
 
     try {
-      const response = await fetch(endpoint, {
+      const response = await adminBeFetch(path, {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -179,7 +178,7 @@ export default function AdminNewsPage() {
     }
 
     try {
-      const response = await fetch(buildAdminBeUrl(`news/admin/${id}`), {
+      const response = await adminBeFetch(`news/admin/${id}`, {
         method: 'DELETE',
       });
 

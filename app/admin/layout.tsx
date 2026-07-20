@@ -3,7 +3,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import AdminSidebar from "@/app/components/AdminSidebar";
 import AdminToastHost from "@/app/components/AdminToastHost";
-import { ADMIN_ACCESS_TOKEN_COOKIE, ADMIN_REFRESH_TOKEN_COOKIE } from "@/lib/admin-auth";
+import {
+	ADMIN_ACCESS_TOKEN_COOKIE,
+	ADMIN_CLIENT_ACCESS_TOKEN_COOKIE,
+	ADMIN_REFRESH_TOKEN_COOKIE,
+} from "@/lib/admin-auth";
 import { adminNavItems } from "@/lib/admin-nav";
 
 export default function AdminLayout({
@@ -15,6 +19,7 @@ export default function AdminLayout({
 		"use server";
 
 		cookies().delete(ADMIN_ACCESS_TOKEN_COOKIE);
+		cookies().delete(ADMIN_CLIENT_ACCESS_TOKEN_COOKIE);
 		cookies().delete(ADMIN_REFRESH_TOKEN_COOKIE);
 		redirect("/admin/login");
 	}

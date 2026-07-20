@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import AdminPotensiForm, { type AdminPotensiFormState } from '@/app/components/AdminPotensiForm';
 import { showAdminToast } from '@/lib/admin-toast';
-import { buildAdminBeUrl } from '@/lib/admin-api-client';
+import { adminBeFetch } from '@/lib/admin-api-client';
 
 type BackendPotential = {
   id: string;
@@ -46,9 +46,8 @@ export default function AdminPotensiEditPage() {
 
   const loadDetail = useCallback(async () => {
     try {
-      const response = await fetch(buildAdminBeUrl(`potensi/${params.id}`), {
+      const response = await adminBeFetch(`potensi/${params.id}`, {
         method: 'GET',
-        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -89,7 +88,7 @@ export default function AdminPotensiEditPage() {
     setIsSaving(true);
 
     try {
-      const response = await fetch(buildAdminBeUrl(`potensi/admin/${params.id}`), {
+      const response = await adminBeFetch(`potensi/admin/${params.id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

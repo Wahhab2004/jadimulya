@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { showAdminToast } from "@/lib/admin-toast";
-import { buildAdminBeUrl } from "@/lib/admin-api-client";
+import { adminBeFetch } from "@/lib/admin-api-client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -53,10 +53,7 @@ function toNum(value: unknown): number {
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-	const res = await fetch(buildAdminBeUrl(path), {
-		cache: "no-store",
-		...options,
-	});
+	const res = await adminBeFetch(path, options);
 	if (!res.ok) throw new Error(`API error: ${res.status}`);
 	const json = (await res.json()) as BackendResponse<T>;
 	return json.data;
@@ -261,9 +258,9 @@ export default function AdminStatistikPage() {
 		});
 		try {
 			const path = editingDusunId
-				? buildAdminBeUrl(`demografi/admin/dusun/${editingDusunId}`)
-				: buildAdminBeUrl("demografi/admin/dusun");
-			const res = await fetch(path, {
+				? `demografi/admin/dusun/${editingDusunId}`
+				: "demografi/admin/dusun";
+			const res = await adminBeFetch(path, {
 				method: editingDusunId ? "PATCH" : "POST",
 				headers: { "Content-Type": "application/json" },
 				body,
@@ -292,7 +289,7 @@ export default function AdminStatistikPage() {
 		)
 			return;
 		try {
-			const res = await fetch(buildAdminBeUrl(`demografi/admin/dusun/${id}`), {
+			const res = await adminBeFetch(`demografi/admin/dusun/${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error(`${res.status}`);
@@ -335,9 +332,9 @@ export default function AdminStatistikPage() {
 		});
 		try {
 			const path = editingAgeId
-				? buildAdminBeUrl(`demografi/admin/usia/${editingAgeId}`)
-				: buildAdminBeUrl("demografi/admin/usia");
-			const res = await fetch(path, {
+				? `demografi/admin/usia/${editingAgeId}`
+				: "demografi/admin/usia";
+			const res = await adminBeFetch(path, {
 				method: editingAgeId ? "PATCH" : "POST",
 				headers: { "Content-Type": "application/json" },
 				body,
@@ -361,7 +358,7 @@ export default function AdminStatistikPage() {
 	async function deleteAge(id: string, label: string) {
 		if (!window.confirm(`Hapus kelompok usia "${label}"?`)) return;
 		try {
-			const res = await fetch(buildAdminBeUrl(`demografi/admin/usia/${id}`), {
+			const res = await adminBeFetch(`demografi/admin/usia/${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error(`${res.status}`);
@@ -404,9 +401,9 @@ export default function AdminStatistikPage() {
 		});
 		try {
 			const path = editingOccId
-				? buildAdminBeUrl(`demografi/admin/pekerjaan/${editingOccId}`)
-				: buildAdminBeUrl("demografi/admin/pekerjaan");
-			const res = await fetch(path, {
+				? `demografi/admin/pekerjaan/${editingOccId}`
+				: "demografi/admin/pekerjaan";
+			const res = await adminBeFetch(path, {
 				method: editingOccId ? "PATCH" : "POST",
 				headers: { "Content-Type": "application/json" },
 				body,
@@ -430,7 +427,7 @@ export default function AdminStatistikPage() {
 	async function deleteOcc(id: string, label: string) {
 		if (!window.confirm(`Hapus jenis pekerjaan "${label}"?`)) return;
 		try {
-			const res = await fetch(buildAdminBeUrl(`demografi/admin/pekerjaan/${id}`), {
+			const res = await adminBeFetch(`demografi/admin/pekerjaan/${id}`, {
 				method: "DELETE",
 			});
 			if (!res.ok) throw new Error(`${res.status}`);

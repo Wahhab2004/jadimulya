@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import { showAdminToast } from '@/lib/admin-toast';
-import { buildAdminBeUrl } from '@/lib/admin-api-client';
+import { adminBeFetch } from '@/lib/admin-api-client';
 
 type PotensiItem = {
   id: string;
@@ -57,9 +57,8 @@ export default function AdminPotensiPage() {
   async function fetchItems() {
     setIsLoading(true);
     try {
-      const response = await fetch(buildAdminBeUrl('potensi/admin/all'), {
+      const response = await adminBeFetch('potensi/admin/all', {
         method: 'GET',
-        cache: 'no-store',
       });
 
       if (!response.ok) {
@@ -98,7 +97,7 @@ export default function AdminPotensiPage() {
     }
 
     try {
-      const response = await fetch(buildAdminBeUrl(`potensi/admin/${itemId}`), {
+      const response = await adminBeFetch(`potensi/admin/${itemId}`, {
         method: 'DELETE',
       });
 
