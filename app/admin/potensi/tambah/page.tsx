@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminPotensiForm, { type AdminPotensiFormState } from '@/app/components/AdminPotensiForm';
 import { showAdminToast } from '@/lib/admin-toast';
+import { buildAdminBeUrl } from '@/lib/admin-api-client';
 
 const emptyForm: AdminPotensiFormState = {
   name: '',
@@ -38,7 +39,7 @@ export default function AdminPotensiTambahPage() {
     setIsSaving(true);
 
     try {
-      const response = await fetch('/api/admin/be/potensi/admin', {
+      const response = await fetch(buildAdminBeUrl('potensi/admin'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

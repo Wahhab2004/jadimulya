@@ -8,6 +8,7 @@ import {
 	isAllowedImageType,
 } from "@/lib/media-store";
 import { showAdminToast } from "@/lib/admin-toast";
+import { buildAdminBeUrl } from "@/lib/admin-api-client";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 // Bentuk data ini sengaja mengikuti persis model `Media` di Prisma
@@ -54,7 +55,7 @@ function formatFileSize(bytes: number) {
 }
 
 async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-	const res = await fetch(`/api/admin/be/${path}`, {
+	const res = await fetch(buildAdminBeUrl(path), {
 		cache: "no-store",
 		...options,
 	});
