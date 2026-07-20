@@ -10,7 +10,8 @@ export type AdminNavItem = {
     | 'sejarah'
     | 'demografi'
     | 'news'
-    | 'media';
+    | 'media'
+    | 'statistik';
   phase?: 'MVP' | 'Next';
   enabled?: boolean;
 };
@@ -76,6 +77,15 @@ export const adminNavItems: AdminNavItem[] = [
     description: 'Upload gambar, validasi file, dan pilih media untuk form konten.',
     shortLabel: 'Media',
     icon: 'media',
+    phase: 'MVP',
+    enabled: true,
+  },
+  {
+    label: 'Statistik',
+    href: '/admin/statistik',
+    description: 'Ringkasan statistik desa.',
+    shortLabel: 'Statistik',
+    icon: 'statistik',
     phase: 'MVP',
     enabled: true,
   },

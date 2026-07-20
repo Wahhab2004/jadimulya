@@ -17,6 +17,7 @@ const iconPaths: Record<AdminNavItem['icon'], string> = {
   demografi: 'M12 12a4 4 0 1 0 0-8a4 4 0 0 0 0 8Zm-7 9a7 7 0 0 1 14 0',
   news: 'M5 5h14v14H5zM8 9h8M8 13h5',
   media: 'M4 6h16v12H4zM9 10l2 2 4-4 3 4',
+  statistik: 'M4 6h16v12H4zM7 10h3v4H7zm5-2h3v6h-3zm5 4h3v2h-3z',
 };
 
 function isActivePath(pathname: string, item: AdminNavItem) {

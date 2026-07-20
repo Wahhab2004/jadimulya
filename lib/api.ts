@@ -186,6 +186,35 @@ export async function getDemografiPerDusun(dataYear?: number) {
 	return fetchApiData<BackendDemografiPerDusunItem[]>(`/demografi/per-dusun${query}`);
 }
 
+export type BackendDemografiDusunAdmin = {
+	id: string;
+	name: string;
+	households: number;
+	male: number;
+	female: number;
+	dataYear?: number;
+	createdAt?: string;
+	updatedAt?: string;
+};
+
+export type BackendDemografiAgeGroup = {
+	id: string;
+	label: string;
+	value: number;
+	sortOrder?: number;
+	createdAt?: string;
+	updatedAt?: string;
+};
+
+export type BackendDemografiOccupation = {
+	id: string;
+	label: string;
+	value: number;
+	sortOrder?: number;
+	createdAt?: string;
+	updatedAt?: string;
+};
+
 export async function getNews(params?: {
 	category?: string;
 	page?: number;
