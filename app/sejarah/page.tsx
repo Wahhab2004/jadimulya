@@ -1,16 +1,17 @@
 "use client";
 
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import SectionHeader from '@/app/components/SectionHeader';
 import { initialSejarahContent, loadStoredSejarahContent, type SejarahContent } from '@/lib/sejarah-store';
+import { getSejarahMilestone, getSejarahNarasi } from '@/lib/api';
 
 const daftarIsi = [
   { id: 'asal-usul', label: 'Asal-usul Desa' },
   { id: 'pemekaran', label: 'Pemekaran Wilayah' },
   { id: 'dusun-kini', label: 'Wilayah Dusun Kini' },
-  { id: 'kepala-desa', label: 'Kepala Desa' },
 ];
 
 const liniMasaUtama = [
@@ -20,12 +21,69 @@ const liniMasaUtama = [
   { year: 'Kini', label: '5 Dusun Aktif' },
 ];
 
+function pickText(...values: Array<string | undefined>) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return '';
+}
+
 export default function SejarahPage() {
   const [content, setContent] = useState<SejarahContent>(initialSejarahContent);
   const [activeSection, setActiveSection] = useState(daftarIsi[0].id);
 
   useEffect(() => {
-    setContent(loadStoredSejarahContent());
+    const localContent = loadStoredSejarahContent();
+    setContent(localContent);
+
+    void (async () => {
+      try {
+        const [narasiItems, milestoneItems] = await Promise.all([
+          getSejarahNarasi(),
+          getSejarahMilestone(),
+        ]);
+
+        const sortedNarasi = [...narasiItems].sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+        const originParagraphs = sortedNarasi
+          .map((item) => pickText(item.content, item.body, item.description))
+          .filter(Boolean);
+
+        const sortedMilestones = [...milestoneItems].sort((a, b) => (a.sortOrder ?? 999) - (b.sortOrder ?? 999));
+        const milestones = sortedMilestones
+          .map((item) => {
+            const yearValue = pickText(
+              typeof item.year === 'number' ? String(item.year) : item.year,
+              'Kini'
+            );
+            const eventValue = pickText(item.event, item.description, item.content);
+
+            if (!eventValue) {
+              return null;
+            }
+
+            return {
+              year: yearValue,
+              event: eventValue,
+              imageUrl: item.imageUrl ?? undefined,
+            };
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
+
+        setContent((current) => ({
+          ...current,
+          heroTitle: pickText(sortedNarasi[0]?.title, current.heroTitle),
+          heroDescription:
+            pickText(sortedNarasi[0]?.subtitle, originParagraphs[0], current.heroDescription),
+          originParagraphs: originParagraphs.length > 0 ? originParagraphs : current.originParagraphs,
+          milestones: milestones.length > 0 ? milestones : current.milestones,
+        }));
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+    })();
   }, []);
 
   useEffect(() => {
@@ -139,6 +197,11 @@ export default function SejarahPage() {
               <p className="mt-4 max-w-3xl text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8">
                 {content.heroDescription}
               </p>
+
+              <div className="mt-6 rounded-2xl border border-sky-200 bg-gradient-to-r from-sky-50 to-blue-50 p-4 sm:p-5">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">{content.visiTitle}</p>
+                <p className="mt-2 text-sm leading-7 text-slate-700 sm:text-base">{content.visiDescription}</p>
+              </div>
             </section>
 
             <section id="asal-usul" className="scroll-mt-24 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-[2rem] sm:p-8">
@@ -214,10 +277,21 @@ export default function SejarahPage() {
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-2">
-                {content.milestones.map((item) => (
-                  <article key={item.year} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+                {content.milestones.map((item, index) => (
+                  <article key={`${item.year}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">{item.year}</p>
                     <p className="mt-2 text-[15px] leading-7 text-slate-700 sm:text-base">{item.event}</p>
+                    {item.imageUrl ? (
+                      <div className="relative mt-4 h-40 w-full overflow-hidden rounded-xl border border-slate-200">
+                        <Image
+                          src={item.imageUrl}
+                          alt={`Foto milestone ${item.year}`}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, 50vw"
+                        />
+                      </div>
+                    ) : null}
                   </article>
                 ))}
               </div>
@@ -237,34 +311,6 @@ export default function SejarahPage() {
               </div>
             </section>
 
-            <section id="kepala-desa" className="scroll-mt-24 rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-[2rem] sm:p-8">
-              <SectionHeader
-                title={content.kepalaDesaTitle}
-                subtitle={content.kepalaDesaSubtitle}
-              />
-              <div className="overflow-x-auto rounded-2xl border border-slate-200">
-                <table className="min-w-full border-collapse text-sm">
-                  <thead className="bg-slate-100 text-left text-slate-700">
-                    <tr>
-                      <th className="px-4 py-3 font-semibold">No</th>
-                      <th className="px-4 py-3 font-semibold">Nama</th>
-                      <th className="px-4 py-3 font-semibold">Masa Jabatan</th>
-                      <th className="px-4 py-3 font-semibold">Keterangan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {content.kepalaDesa.map((item) => (
-                      <tr key={item.no} className="border-t border-slate-200 bg-white text-slate-700">
-                        <td className="px-4 py-3">{item.no}</td>
-                        <td className="px-4 py-3 font-medium text-slate-900">{item.nama}</td>
-                        <td className="px-4 py-3">{item.masaJabatan}</td>
-                        <td className="px-4 py-3">{item.keterangan}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
           </div>
         </div>
       </main>

@@ -1,10 +1,18 @@
 "use client";
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { initialSejarahContent, loadStoredSejarahContent, saveSejarahContent, type SejarahContent, type SejarahMilestone } from '@/lib/sejarah-store';
+import {
+  loadRemoteMediaItems,
+  loadStoredMediaItems,
+  subscribeMediaLibraryUpdates,
+  type MediaItem,
+} from '@/lib/media-store';
+import { showAdminToast } from '@/lib/admin-toast';
 
-const emptyMilestone: SejarahMilestone = { year: '', event: '' };
+const emptyMilestone: SejarahMilestone = { year: '', event: '', imageUrl: '' };
 
 function SectionIcon({ children }: { children: React.ReactNode }) {
   return <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">{children}</span>;
@@ -12,12 +20,37 @@ function SectionIcon({ children }: { children: React.ReactNode }) {
 
 export default function AdminSejarahMilestonePage() {
   const [content, setContent] = useState<SejarahContent>(initialSejarahContent);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [formState, setFormState] = useState<SejarahMilestone>(emptyMilestone);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
     setContent(loadStoredSejarahContent());
+
+    let isMounted = true;
+
+    const syncMediaItems = async () => {
+      const initialItems = loadStoredMediaItems();
+      if (isMounted) {
+        setMediaItems(initialItems);
+      }
+
+      const remoteItems = await loadRemoteMediaItems();
+      if (isMounted) {
+        setMediaItems(remoteItems);
+      }
+    };
+
+    void syncMediaItems();
+    const unsubscribe = subscribeMediaLibraryUpdates(() => {
+      setMediaItems(loadStoredMediaItems());
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   function resetForm() {
@@ -40,7 +73,9 @@ export default function AdminSejarahMilestonePage() {
     const nextContent = { ...content, milestones: nextMilestones };
     setContent(nextContent);
     saveSejarahContent(nextContent);
-    setNotice(editingIndex !== null ? 'Milestone berhasil diperbarui.' : 'Milestone berhasil ditambahkan.');
+    const message = editingIndex !== null ? 'Milestone berhasil diperbarui.' : 'Milestone berhasil ditambahkan.';
+    setNotice(message);
+    showAdminToast(message, 'success');
     resetForm();
   }
 
@@ -50,10 +85,17 @@ export default function AdminSejarahMilestonePage() {
   }
 
   function removeMilestone(index: number) {
+    const confirmed = window.confirm('Hapus milestone ini? Tindakan ini tidak bisa dibatalkan.');
+    if (!confirmed) {
+      return;
+    }
+
     const nextContent = { ...content, milestones: content.milestones.filter((_, itemIndex) => itemIndex !== index) };
     setContent(nextContent);
     saveSejarahContent(nextContent);
-    setNotice('Milestone berhasil dihapus.');
+    const message = 'Milestone berhasil dihapus.';
+    setNotice(message);
+    showAdminToast(message, 'success');
     if (editingIndex === index) resetForm();
   }
 
@@ -89,6 +131,20 @@ export default function AdminSejarahMilestonePage() {
           <h3 className="text-lg font-semibold text-slate-900">{editingIndex !== null ? 'Edit Milestone' : 'Tambah Milestone'}</h3>
           <div className="mt-4 space-y-3">
             <input type="text" placeholder="Tahun / Label" value={formState.year} onChange={(event) => setFormState((current) => ({ ...current, year: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
+            <input type="text" placeholder="URL Foto (opsional)" value={formState.imageUrl ?? ''} onChange={(event) => setFormState((current) => ({ ...current, imageUrl: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
+            <select
+              value=""
+              onChange={(event) => {
+                if (!event.target.value) return;
+                setFormState((current) => ({ ...current, imageUrl: event.target.value }));
+              }}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none transition focus:border-sky-300"
+            >
+              <option value="">Pilih foto dari media library</option>
+              {mediaItems.map((item) => (
+                <option key={item.id} value={item.url}>{item.name}</option>
+              ))}
+            </select>
             <textarea placeholder="Deskripsi milestone" value={formState.event} onChange={(event) => setFormState((current) => ({ ...current, event: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
           </div>
           <div className="mt-4 flex gap-2">
@@ -115,6 +171,11 @@ export default function AdminSejarahMilestonePage() {
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{item.year}</p>
                     <p className="mt-1 text-sm leading-6 text-slate-700">{item.event}</p>
+                    {item.imageUrl ? (
+                      <div className="relative mt-3 h-20 w-28 overflow-hidden rounded-xl border border-slate-200">
+                        <Image src={item.imageUrl} alt={`Foto milestone ${item.year}`} fill className="object-cover" sizes="112px" />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
                 <div className="mt-3 flex gap-2">

@@ -1,32 +1,26 @@
 "use client";
 
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import { initialPotensiItems, loadStoredPotensiItems, type PotensiCategory, type PotensiItem } from '@/lib/potensi-store';
+import { getPotensi } from '@/lib/api';
 
-const categoryFilters = ['Semua Potensi', 'UMKM', 'Pertanian', 'Wisata'] as const;
+const categoryFilters = ['Semua Potensi', 'Pertanian', 'Wisata'] as const;
 type CategoryFilter = (typeof categoryFilters)[number];
 
 const categoryBadgeStyles: Record<PotensiCategory, string> = {
-  UMKM: 'bg-blue-100 text-blue-700',
   Pertanian: 'bg-emerald-100 text-emerald-700',
   Wisata: 'bg-amber-100 text-amber-700',
 };
 
 const categoryOrderWeight: Record<PotensiCategory, number> = {
-  UMKM: 1,
-  Pertanian: 2,
-  Wisata: 3,
+  Pertanian: 1,
+  Wisata: 2,
 };
 
 const cardActionIcons: Record<PotensiCategory, JSX.Element> = {
-  UMKM: (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden="true">
-      <path d="M6 8h12l-1 11H7L6 8Z" />
-      <path d="M9 8V6a3 3 0 1 1 6 0v2" />
-    </svg>
-  ),
   Pertanian: (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden="true">
       <path d="M7 13c0 3 2 5 5 5" />
@@ -50,7 +44,30 @@ export default function PotensiPage() {
   const [visibleCount, setVisibleCount] = useState(6);
 
   useEffect(() => {
-    setPotensiItems(loadStoredPotensiItems());
+    const localItems = loadStoredPotensiItems();
+    setPotensiItems(localItems);
+
+    void (async () => {
+      try {
+        const apiItems = await getPotensi();
+        const mappedItems = apiItems
+          .filter((item) => item.category === 'PERTANIAN' || item.category === 'PARIWISATA')
+          .map((item) => ({
+            id: item.id,
+            title: item.name,
+            description: item.shortDesc,
+            category: item.category === 'PARIWISATA' ? 'Wisata' : 'Pertanian',
+            tag: item.isHighlight ? 'Highlight' : 'Reguler',
+            imageUrl: item.coverImage ?? '/images/potensi-wisata.jpg',
+          } satisfies PotensiItem));
+
+        if (mappedItems.length > 0) {
+          setPotensiItems(mappedItems);
+        }
+      } catch {
+        // Keep local fallback content when API request fails.
+      }
+    })();
   }, []);
 
   const filteredItems = useMemo(() => {
@@ -75,7 +92,14 @@ export default function PotensiPage() {
       <main className="pb-10">
         <section className="relative isolate overflow-hidden">
           <div className="absolute inset-0 bg-slate-900/35" aria-hidden="true" />
-          <img src="/images/hero-bg.jpg" alt="Lanskap potensi Desa Jadimulya" className="h-[300px] w-full object-cover sm:h-[360px] lg:h-[420px]" />
+          <Image
+            src="/images/hero-bg.jpg"
+            alt="Lanskap potensi Desa Jadimulya"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority
+          />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/60 via-slate-900/25 to-transparent" aria-hidden="true" />
 
           <div className="absolute inset-0 mx-auto flex h-full w-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
@@ -85,8 +109,7 @@ export default function PotensiPage() {
               </span>
               <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">Potensi dan Keunggulan Lokal Jadimulya</h1>
               <p className="mt-4 max-w-xl text-sm leading-7 text-white/85 sm:text-base">
-                Menemukan permata tersembunyi di jantung desa kami, mulai dari produk UMKM berkualitas hingga destinasi
-                wisata alam yang asri.
+                Menemukan kekuatan desa dari sektor pertanian dan pariwisata yang menjadi prioritas pengembangan tahap awal.
               </p>
             </div>
           </div>
@@ -124,7 +147,13 @@ export default function PotensiPage() {
             {visibleItems.map((item) => (
               <article key={item.id} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
                 <div className="relative h-56 overflow-hidden bg-slate-200">
-                  <img src={item.imageUrl} alt={item.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.title}
+                    fill
+                    className="object-cover transition duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                  />
                   <span className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold ${categoryBadgeStyles[item.category]}`}>
                     {item.category}
                   </span>
@@ -140,7 +169,7 @@ export default function PotensiPage() {
                       type="button"
                       className="inline-flex flex-1 items-center justify-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800"
                     >
-                      {item.actionLabel}
+                      Lihat Detail
                     </button>
                     <button
                       type="button"

@@ -18,18 +18,7 @@ export default function DemografiSection({ demografi }: DemografiSectionProps) {
       <SectionTitle title="Demografi" subtitle="Informasi dasar demografi dan pekerjaan utama warga desa." />
       <StatGrid items={summaryItems} />
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-2">
-        <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h3 className="text-xl font-semibold text-slate-900">Kelompok Usia</h3>
-          <div className="mt-5 space-y-4">
-            {demografi.ageGroups.map((group) => (
-              <div key={group.label} className="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-                <span className="text-slate-800">{group.label}</span>
-                <span className="font-semibold text-slate-900">{group.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="mt-10">
         <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
           <h3 className="text-xl font-semibold text-slate-900">Pekerjaan Utama</h3>
           <div className="mt-5 space-y-4">

@@ -2,30 +2,77 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import AdminPotensiForm from '@/app/components/AdminPotensiForm';
-import { initialPotensiItems, savePotensiItems, type PotensiItem } from '@/lib/potensi-store';
+import AdminPotensiForm, { type AdminPotensiFormState } from '@/app/components/AdminPotensiForm';
+import { showAdminToast } from '@/lib/admin-toast';
+import { adminBeFetch } from '@/lib/admin-api-client';
 
-const emptyForm: Omit<PotensiItem, 'id'> = {
-  title: '',
-  description: '',
-  category: 'UMKM',
-  tag: '',
-  actionLabel: '',
-  imageUrl: '/images/potensi-umkm.jpg',
+const emptyForm: AdminPotensiFormState = {
+  name: '',
+  shortDesc: '',
+  fullDesc: '',
+  category: 'PERTANIAN',
+  coverImage: '',
+  isHighlight: false,
 };
+
+function normalizeUrl(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (trimmed.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return new URL(trimmed, window.location.origin).toString();
+    }
+
+    return undefined;
+  }
+
+  try {
+    return new URL(trimmed).toString();
+  } catch {
+    return undefined;
+  }
+}
 
 export default function AdminPotensiTambahPage() {
   const router = useRouter();
   const [formState, setFormState] = useState(emptyForm);
+  const [isSaving, setIsSaving] = useState(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const nextId = `p-${Date.now()}`;
-    const currentItemsRaw = typeof window !== 'undefined' ? window.localStorage.getItem('jadimulya_potensi_items') : null;
-    const currentItems = currentItemsRaw ? (JSON.parse(currentItemsRaw) as PotensiItem[]) : initialPotensiItems;
-    savePotensiItems([{ id: nextId, ...formState }, ...currentItems]);
-    router.push('/admin/potensi');
+    setIsSaving(true);
+
+    try {
+      const response = await adminBeFetch('potensi/admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formState.name.trim(),
+          shortDesc: formState.shortDesc.trim(),
+          fullDesc: formState.fullDesc.trim() || undefined,
+          category: formState.category,
+          coverImage: normalizeUrl(formState.coverImage),
+          isHighlight: formState.isHighlight,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Gagal menambah potensi');
+      }
+
+      showAdminToast('Potensi baru berhasil ditambahkan.', 'success');
+      router.push('/admin/potensi');
+    } catch {
+      showAdminToast('Gagal menambah potensi. Periksa format input.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -42,7 +89,7 @@ export default function AdminPotensiTambahPage() {
         formState={formState}
         onChange={setFormState}
         onSubmit={handleSubmit}
-        submitLabel="Simpan Potensi"
+        submitLabel={isSaving ? 'Menyimpan...' : 'Simpan Potensi'}
         cancelHref="/admin/potensi"
       />
     </div>

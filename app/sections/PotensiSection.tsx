@@ -8,7 +8,7 @@ type PotensiSectionProps = {
 export default function PotensiSection({ potensi }: PotensiSectionProps) {
   return (
     <section id="potensi" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
-      <SectionTitle title="Potensi Desa" subtitle="UMKM, pertanian, wisata, dan potensi lokal Desa Jadimulya." />
+      <SectionTitle title="Potensi Desa" subtitle="Pertanian dan pariwisata unggulan Desa Jadimulya." />
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
         {potensi.map((item) => (
           <article key={item.id} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">

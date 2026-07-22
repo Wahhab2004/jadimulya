@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 type NewsCardProps = {
   tag: string;
   title: string;
@@ -11,7 +13,7 @@ export default function NewsCard({ tag, title, date, description, imageUrl }: Ne
     <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="relative h-56 overflow-hidden bg-slate-100">
         {imageUrl ? (
-          <img src={imageUrl} alt={title} className="h-full w-full object-cover transition duration-500 hover:scale-105" />
+          <Image src={imageUrl} alt={title} fill className="object-cover transition duration-500 hover:scale-105" sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" />
         ) : (
           <div className="flex h-full items-center justify-center text-slate-400">No Image</div>
         )}

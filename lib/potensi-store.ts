@@ -1,4 +1,4 @@
-export type PotensiCategory = 'UMKM' | 'Pertanian' | 'Wisata';
+export type PotensiCategory = 'Pertanian' | 'Wisata';
 
 export type PotensiItem = {
   id: string;
@@ -6,7 +6,6 @@ export type PotensiItem = {
   description: string;
   category: PotensiCategory;
   tag: string;
-  actionLabel: string;
   imageUrl: string;
 };
 
@@ -15,13 +14,12 @@ export const POTENSI_STORAGE_KEY = 'jadimulya_potensi_items';
 export const initialPotensiItems: PotensiItem[] = [
   {
     id: 'p-1',
-    title: 'Anyaman Bambu Kreatif',
+    title: 'Kelompok Tani Sawah Lembur',
     description:
-      'Produk kerajinan tangan khas Jadimulya yang menggabungkan teknik tradisional dengan desain modern untuk pasar rumah tangga dan suvenir.',
-    category: 'UMKM',
-    tag: 'Produk Unggulan',
-    actionLabel: 'Lihat Produk',
-    imageUrl: '/images/potensi-umkm.jpg',
+      'Kelompok tani desa yang mengelola lahan padi secara gotong royong dengan fokus peningkatan kualitas panen dan distribusi lokal.',
+    category: 'Pertanian',
+    tag: 'Highlight',
+    imageUrl: '/images/potensi-kopi.jpg',
   },
   {
     id: 'p-2',
@@ -29,51 +27,58 @@ export const initialPotensiItems: PotensiItem[] = [
     description:
       'Destinasi alam dengan udara sejuk, aliran air jernih, dan jalur trekking ringan yang cocok untuk wisata keluarga dan komunitas.',
     category: 'Wisata',
-    tag: 'Destinasi Alam',
-    actionLabel: 'Pesan Tiket',
+    tag: 'Highlight',
     imageUrl: '/images/potensi-wisata.jpg',
   },
   {
     id: 'p-3',
-    title: 'Kopi Robusta Jadimulya',
+    title: 'Kampung Domba Jadimulya',
     description:
-      'Komoditas kopi robusta dari lereng perbukitan yang diproses petani lokal dengan cita rasa cokelat dan aroma rempah lembut.',
-    category: 'Pertanian',
-    tag: 'Komoditas Organik',
-    actionLabel: 'Beli Online',
-    imageUrl: '/images/potensi-kopi.jpg',
-  },
-  {
-    id: 'p-4',
-    title: 'Batik Tulis Sekar Jagad',
-    description:
-      'Warisan budaya yang dikerjakan kelompok perajin desa dengan motif lokal, pewarna alami, dan sentuhan kontemporer.',
-    category: 'UMKM',
-    tag: 'Warisan Budaya',
-    actionLabel: 'Lihat Koleksi',
-    imageUrl: '/images/potensi-umkm.jpg',
-  },
-  {
-    id: 'p-5',
-    title: 'Sentra Buah Tropis',
-    description:
-      'Kebun buah masyarakat yang menghasilkan manggis, rambutan, dan durian lokal dengan distribusi ke pasar wilayah sekitar.',
-    category: 'Pertanian',
-    tag: 'Hasil Bumi',
-    actionLabel: 'Hubungi Petani',
+      'Wisata edukasi peternakan domba dengan aktivitas interaktif untuk keluarga, sekolah, dan komunitas.',
+    category: 'Wisata',
+    tag: 'Prioritas',
     imageUrl: '/images/potensi-wisata.jpg',
   },
   {
-    id: 'p-6',
-    title: 'Kampung Kuliner Tradisional',
+    id: 'p-4',
+    title: 'Sentra Padi Organik',
     description:
-      'Ragam kuliner khas desa dari resep turun-temurun, disajikan dengan pengalaman makan yang hangat dan otentik.',
-    category: 'Wisata',
-    tag: 'Kuliner Khas',
-    actionLabel: 'Eksplorasi Menu',
+      'Komoditas pertanian andalan dengan praktik budidaya berkelanjutan dan pendampingan kelompok tani.',
+    category: 'Pertanian',
+    tag: 'Unggulan',
     imageUrl: '/images/potensi-kopi.jpg',
   },
 ];
+
+function isPotensiCategory(value: unknown): value is PotensiCategory {
+  return value === 'Pertanian' || value === 'Wisata';
+}
+
+function sanitizeItem(item: unknown): PotensiItem | null {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
+
+  const candidate = item as Record<string, unknown>;
+  if (!isPotensiCategory(candidate.category)) {
+    return null;
+  }
+
+  const id = typeof candidate.id === 'string' && candidate.id.trim() ? candidate.id : `p-${Date.now()}`;
+  const title = typeof candidate.title === 'string' && candidate.title.trim() ? candidate.title : 'Potensi Desa';
+  const description = typeof candidate.description === 'string' ? candidate.description : '';
+  const tag = typeof candidate.tag === 'string' && candidate.tag.trim() ? candidate.tag : 'Highlight';
+  const imageUrl = typeof candidate.imageUrl === 'string' && candidate.imageUrl.trim() ? candidate.imageUrl : '/images/potensi-wisata.jpg';
+
+  return {
+    id,
+    title,
+    description,
+    category: candidate.category,
+    tag,
+    imageUrl,
+  };
+}
 
 export function loadStoredPotensiItems() {
   if (typeof window === 'undefined') {
@@ -87,8 +92,16 @@ export function loadStoredPotensiItems() {
   }
 
   try {
-    const parsed = JSON.parse(rawValue) as PotensiItem[];
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : initialPotensiItems;
+    const parsed = JSON.parse(rawValue) as unknown;
+    if (!Array.isArray(parsed)) {
+      return initialPotensiItems;
+    }
+
+    const nextItems = parsed
+      .map((item) => sanitizeItem(item))
+      .filter((item): item is PotensiItem => item !== null);
+
+    return nextItems.length > 0 ? nextItems : initialPotensiItems;
   } catch {
     return initialPotensiItems;
   }

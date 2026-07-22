@@ -103,6 +103,32 @@ export default function AdminSejarahKontenPage() {
           <div className="flex items-center gap-3">
             <SectionIcon>
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 4.75l5 2.5v4.5c0 3.2-2.1 6.16-5 7.5-2.9-1.34-5-4.3-5-7.5v-4.5z" />
+                <path d="M9.5 11.75l1.75 1.75 3.25-3.5" />
+              </svg>
+            </SectionIcon>
+            <div>
+              <h3 className="text-base font-semibold text-slate-900">Kotak Visi Desa</h3>
+              <p className="text-sm text-slate-600">Tampil di halaman publik sejarah sebagai penguat identitas arah pembangunan desa.</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Judul Visi</span>
+              <input type="text" value={content.visiTitle} onChange={(event) => setContent((current) => ({ ...current, visiTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+            </label>
+            <label className="block">
+              <span className="mb-2 block text-sm font-medium text-slate-700">Deskripsi Visi</span>
+              <textarea value={content.visiDescription} onChange={(event) => setContent((current) => ({ ...current, visiDescription: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-300" />
+            </label>
+          </div>
+        </section>
+
+        <section className="space-y-4 border-b border-slate-200 px-5 py-5 lg:px-6">
+          <div className="flex items-center gap-3">
+            <SectionIcon>
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M6.75 5.75h10.5" />
                 <path d="M6.75 11.75h10.5" />
                 <path d="M6.75 17.75h7.5" />
