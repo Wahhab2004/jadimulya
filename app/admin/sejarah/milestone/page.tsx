@@ -4,7 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { initialSejarahContent, loadStoredSejarahContent, saveSejarahContent, type SejarahContent, type SejarahMilestone } from '@/lib/sejarah-store';
-import { loadStoredMediaItems, type MediaItem } from '@/lib/media-store';
+import {
+  loadRemoteMediaItems,
+  loadStoredMediaItems,
+  subscribeMediaLibraryUpdates,
+  type MediaItem,
+} from '@/lib/media-store';
 import { showAdminToast } from '@/lib/admin-toast';
 
 const emptyMilestone: SejarahMilestone = { year: '', event: '', imageUrl: '' };
@@ -22,7 +27,30 @@ export default function AdminSejarahMilestonePage() {
 
   useEffect(() => {
     setContent(loadStoredSejarahContent());
-    setMediaItems(loadStoredMediaItems());
+
+    let isMounted = true;
+
+    const syncMediaItems = async () => {
+      const initialItems = loadStoredMediaItems();
+      if (isMounted) {
+        setMediaItems(initialItems);
+      }
+
+      const remoteItems = await loadRemoteMediaItems();
+      if (isMounted) {
+        setMediaItems(remoteItems);
+      }
+    };
+
+    void syncMediaItems();
+    const unsubscribe = subscribeMediaLibraryUpdates(() => {
+      setMediaItems(loadStoredMediaItems());
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   function resetForm() {

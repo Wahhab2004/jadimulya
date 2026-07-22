@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from 'react';
-import { loadStoredMediaItems, type MediaItem } from '@/lib/media-store';
+import {
+  loadRemoteMediaItems,
+  loadStoredMediaItems,
+  subscribeMediaLibraryUpdates,
+  type MediaItem,
+} from '@/lib/media-store';
 import {
   type OrganisasiGroup,
   type OrganisasiMember,
@@ -106,6 +111,14 @@ function normalizeUrl(value: string) {
     return undefined;
   }
 
+  if (trimmed.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return new URL(trimmed, window.location.origin).toString();
+    }
+
+    return undefined;
+  }
+
   try {
     const parsed = new URL(trimmed);
     return parsed.toString();
@@ -124,7 +137,30 @@ export default function AdminOrganisasiPage() {
 
   useEffect(() => {
     void fetchMembers();
-    setMediaItems(loadStoredMediaItems());
+
+    let isMounted = true;
+
+    const syncMediaItems = async () => {
+      const initialItems = loadStoredMediaItems();
+      if (isMounted) {
+        setMediaItems(initialItems);
+      }
+
+      const remoteItems = await loadRemoteMediaItems();
+      if (isMounted) {
+        setMediaItems(remoteItems);
+      }
+    };
+
+    void syncMediaItems();
+    const unsubscribe = subscribeMediaLibraryUpdates(() => {
+      setMediaItems(loadStoredMediaItems());
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   async function fetchMembers() {
@@ -169,6 +205,14 @@ export default function AdminOrganisasiPage() {
 
     if (!form.position.trim()) {
       return 'Jabatan aparatur wajib diisi.';
+    }
+
+    if (!form.photoUrl.trim()) {
+      return 'Foto aparatur wajib diisi.';
+    }
+
+    if (!normalizeUrl(form.photoUrl)) {
+      return 'URL foto aparatur tidak valid.';
     }
 
     const duplicate = members.some(
@@ -336,6 +380,7 @@ export default function AdminOrganisasiPage() {
               onChange={(event) => setForm((current) => ({ ...current, photoUrl: event.target.value }))}
               placeholder="URL foto profil"
               className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-sky-300"
+              required
             />
 
             <select

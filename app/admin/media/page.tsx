@@ -6,6 +6,7 @@ import {
 	MEDIA_MAX_FILE_SIZE,
 	isAllowedImageSize,
 	isAllowedImageType,
+	saveMediaItems,
 } from "@/lib/media-store";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch, buildAdminBeUrl } from "@/lib/admin-api-client";
@@ -96,7 +97,18 @@ export default function AdminMediaPage() {
 		setIsLoading(true);
 		try {
 			const data = await apiFetch<MediaItem[]>("media");
-			setItems(Array.isArray(data) ? data : []);
+			const nextItems = Array.isArray(data) ? data : [];
+			setItems(nextItems);
+			saveMediaItems(
+				nextItems.map((item) => ({
+					id: item.id,
+					name: item.fileName,
+					url: item.url,
+					size: item.sizeBytes,
+					mimeType: item.mimeType,
+					createdAt: item.createdAt,
+				})),
+			);
 		} catch {
 			showAdminToast("Gagal memuat daftar media dari backend.", "error");
 		} finally {

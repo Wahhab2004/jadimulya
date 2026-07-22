@@ -3,6 +3,12 @@
 import { useEffect, useState } from 'react';
 import { showAdminToast } from '@/lib/admin-toast';
 import { adminBeFetch } from '@/lib/admin-api-client';
+import {
+  loadRemoteMediaItems,
+  loadStoredMediaItems,
+  subscribeMediaLibraryUpdates,
+  type MediaItem,
+} from '@/lib/media-store';
 
 type NewsCategory = 'PEMBANGUNAN' | 'KESEHATAN' | 'PERTANIAN' | 'WISATA' | 'LAINNYA';
 
@@ -58,6 +64,14 @@ function normalizeUrl(value: string) {
     return undefined;
   }
 
+  if (trimmed.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return new URL(trimmed, window.location.origin).toString();
+    }
+
+    return undefined;
+  }
+
   try {
     return new URL(trimmed).toString();
   } catch {
@@ -76,6 +90,7 @@ function toDateInputValue(value: string) {
 
 export default function AdminNewsPage() {
   const [items, setItems] = useState<NewsItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [form, setForm] = useState<NewsFormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +98,30 @@ export default function AdminNewsPage() {
 
   useEffect(() => {
     void loadNews();
+
+    let isMounted = true;
+
+    const syncMediaItems = async () => {
+      const initialItems = loadStoredMediaItems();
+      if (isMounted) {
+        setMediaItems(initialItems);
+      }
+
+      const remoteItems = await loadRemoteMediaItems();
+      if (isMounted) {
+        setMediaItems(remoteItems);
+      }
+    };
+
+    void syncMediaItems();
+    const unsubscribe = subscribeMediaLibraryUpdates(() => {
+      setMediaItems(loadStoredMediaItems());
+    });
+
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
   }, []);
 
   async function loadNews() {
@@ -136,6 +175,17 @@ export default function AdminNewsPage() {
       return;
     }
 
+    if (!form.coverImage.trim()) {
+      showAdminToast('Cover berita wajib diisi.', 'info');
+      return;
+    }
+
+    const normalizedCoverImage = normalizeUrl(form.coverImage);
+    if (!normalizedCoverImage) {
+      showAdminToast('URL cover berita tidak valid.', 'info');
+      return;
+    }
+
     setIsSaving(true);
     const path = editingId ? `news/admin/${editingId}` : 'news/admin';
     const method = editingId ? 'PATCH' : 'POST';
@@ -151,7 +201,7 @@ export default function AdminNewsPage() {
           category: form.category,
           excerpt: form.excerpt.trim() || undefined,
           content: form.content.trim(),
-          coverImage: normalizeUrl(form.coverImage),
+          coverImage: normalizedCoverImage,
           isPublished: form.isPublished,
           publishedAt: form.publishedAt ? new Date(form.publishedAt).toISOString() : undefined,
         }),
@@ -235,9 +285,24 @@ export default function AdminNewsPage() {
               type="text"
               value={form.coverImage}
               onChange={(event) => setForm((current) => ({ ...current, coverImage: event.target.value }))}
-              placeholder="URL cover image (opsional)"
+              placeholder="URL cover image (wajib)"
               className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-sky-300"
+              required
             />
+
+            <select
+              value=""
+              onChange={(event) => {
+                if (!event.target.value) return;
+                setForm((current) => ({ ...current, coverImage: event.target.value }));
+              }}
+              className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm outline-none focus:border-sky-300"
+            >
+              <option value="">Pilih cover dari media library</option>
+              {mediaItems.map((item) => (
+                <option key={item.id} value={item.url}>{item.name}</option>
+              ))}
+            </select>
 
             <input
               type="date"

@@ -31,6 +31,14 @@ function normalizeUrl(value: string) {
     return undefined;
   }
 
+  if (trimmed.startsWith('/')) {
+    if (typeof window !== 'undefined') {
+      return new URL(trimmed, window.location.origin).toString();
+    }
+
+    return undefined;
+  }
+
   try {
     return new URL(trimmed).toString();
   } catch {
