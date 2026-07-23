@@ -1,8 +1,8 @@
 export const statistikSummary = [
-  { label: 'Total Penduduk', value: '4,281', note: '+2.4% vs tahun lalu', noteClass: 'text-emerald-700' },
+  { label: 'Total Penduduk', value: '4,281', note: '+2.4% vs tahun lalu', noteClass: 'text-sky-700' },
   { label: 'Kepala Keluarga', value: '1,142', note: 'Rata-rata 3.7 jiwa/KK', noteClass: 'text-sky-700' },
   { label: 'Laki-laki', value: '2,114', note: '49.4% dari populasi', noteClass: 'text-amber-700' },
-  { label: 'Perempuan', value: '2,167', note: '50.6% dari populasi', noteClass: 'text-emerald-700' },
+  { label: 'Perempuan', value: '2,167', note: '50.6% dari populasi', noteClass: 'text-sky-700' },
 ] as const;
 
 export const ageGroups = [

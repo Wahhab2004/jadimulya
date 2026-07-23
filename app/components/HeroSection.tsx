@@ -45,17 +45,17 @@ export default function HeroSection({
 	const currentSlide = slides[safeIndex];
 
 	return (
-		<section className="relative overflow-hidden bg-slate-900 text-white shadow-inner">
+		<section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-sky-950 text-white shadow-inner">
 			{currentSlide ? (
 				<Image
 					src={currentSlide.imageUrl}
 					alt={currentSlide.caption}
 					fill
-					className="object-cover sepia-[0.35] contrast-110 saturate-[0.8]"
+					className="object-cover sepia-[0.28] contrast-110 saturate-[0.85]"
 					sizes="100vw"
 				/>
 			) : null}
-			<div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-900/60 to-slate-900/35" />
+			<div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-sky-950/55 to-sky-900/35" />
 			<div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
 				<div className="max-w-3xl">
 					<span className="inline-flex rounded-full border border-sky-200/40 bg-sky-500/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-sky-100">

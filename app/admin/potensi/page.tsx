@@ -119,13 +119,13 @@ export default function AdminPotensiPage() {
   return (
     <div className="space-y-4">
       <section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Modul Potensi</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">Modul Potensi</p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-900">Kelola Potensi Desa</h2>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600 sm:text-base">
           Tahap MVP difokuskan ke dua kategori aktif: Pertanian dan Pariwisata. Aksi publik diseragamkan menjadi tombol
           Lihat Detail hingga ada konfirmasi lanjutan dari perangkat desa.
         </p>
-        {notice ? <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div> : null}
+        {notice ? <div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">{notice}</div> : null}
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -161,7 +161,7 @@ export default function AdminPotensiPage() {
               <p className="font-semibold text-slate-900">Tambah Potensi Baru</p>
               <p className="mt-1 text-sm text-slate-500">Gunakan form khusus untuk menambah data baru dengan lebih fokus.</p>
             </Link>
-            <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-4 text-sm leading-6 text-emerald-900">
+            <div className="rounded-2xl border border-sky-100 bg-sky-50 px-4 py-4 text-sm leading-6 text-sky-900">
               Tip: untuk edit data, cukup buka daftar potensi di sebelah kanan lalu tekan tombol Edit pada item yang dipilih.
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function AdminPotensiPage() {
               <article key={item.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700">{item.category}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-700">{item.category}</p>
                     <h4 className="mt-2 text-lg font-semibold text-slate-900">{item.title}</h4>
                     <p className="mt-2 text-sm leading-6 text-slate-600">{item.description}</p>
                   </div>

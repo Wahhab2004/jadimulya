@@ -13,7 +13,7 @@ export default function SectionHeader({ title, subtitle, linkLabel, linkHref }: 
         {subtitle ? <p className="mt-3 max-w-2xl text-slate-600">{subtitle}</p> : null}
       </div>
       {linkLabel && linkHref ? (
-        <a href={linkHref} className="inline-flex items-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50">
+        <a href={linkHref} className="inline-flex items-center rounded-full border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 shadow-sm transition hover:bg-sky-50 hover:border-sky-300">
           {linkLabel}
         </a>
       ) : null}

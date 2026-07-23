@@ -4,9 +4,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { initialSejarahContent, loadStoredSejarahContent, type SejarahContent } from '@/lib/sejarah-store';
 
-function ModuleIcon({ children, tone = 'emerald' }: { children: React.ReactNode; tone?: 'emerald' | 'sky' | 'amber' }) {
+function ModuleIcon({ children, tone = 'sky' }: { children: React.ReactNode; tone?: 'sky' | 'amber' }) {
   const tones = {
-    emerald: 'bg-emerald-100 text-emerald-700',
     sky: 'bg-sky-100 text-sky-700',
     amber: 'bg-amber-100 text-amber-700',
   };
@@ -26,11 +25,11 @@ export default function AdminSejarahPage() {
       <section className="overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white shadow-[0_18px_40px_-32px_rgba(15,23,42,0.24)]">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 px-5 py-5 lg:px-6">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">Modul Sejarah</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">Modul Sejarah</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">Kelola Sejarah Desa</h2>
             <p className="mt-2 text-sm text-slate-600">Tampilan dibuat seperti halaman manajemen: lebih datar, lebih singkat, dan mudah dibaca.</p>
           </div>
-          <Link href="/sejarah" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-100">
+          <Link href="/sejarah" className="rounded-xl border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-medium text-sky-700 transition hover:bg-sky-100">
             Lihat Halaman Publik
           </Link>
         </div>
@@ -49,7 +48,7 @@ export default function AdminSejarahPage() {
         <div className="grid xl:grid-cols-[1.2fr_0.8fr]">
           <div>
             <Link href="/admin/sejarah/konten" className="flex items-start gap-4 border-b border-slate-200 px-5 py-4 transition hover:bg-slate-50 lg:px-6">
-            <ModuleIcon tone="emerald">
+            <ModuleIcon tone="sky">
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M7 4.75h7l3 3V19.25a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z" />
                 <path d="M14 4.75v3h3" />
@@ -88,7 +87,7 @@ export default function AdminSejarahPage() {
 
           <section className="border-t border-slate-200 px-5 py-5 xl:border-l xl:border-t-0 lg:px-6">
           <div className="flex items-center gap-3">
-            <ModuleIcon tone="emerald">
+            <ModuleIcon tone="sky">
               <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M5 18.25h14" />
                 <path d="M7.75 14.5h8.5" />
@@ -103,7 +102,7 @@ export default function AdminSejarahPage() {
 
           <div className="mt-4 flex flex-wrap gap-2">
             {content.dusunSaatIni.map((dusun) => (
-              <span key={dusun} className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-800">
+              <span key={dusun} className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-medium text-sky-800">
                 {dusun}
               </span>
             ))}

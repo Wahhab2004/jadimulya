@@ -6,7 +6,7 @@ const topSummary = [
 		label: "Konten Terbit",
 		value: "32",
 		note: "5 pembaruan minggu ini",
-		accent: "from-emerald-400 to-emerald-500",
+		accent: "from-sky-400 to-blue-500",
 	},
 	{
 		label: "Potensi Aktif",
@@ -18,7 +18,7 @@ const topSummary = [
 		label: "Data Kependudukan",
 		value: "4.281",
 		note: "Sinkron per 2024",
-		accent: "from-cyan-400 to-emerald-500",
+		accent: "from-cyan-400 to-sky-500",
 	},
 	{
 		label: "Draft Modul",
@@ -44,7 +44,7 @@ const months = [
 	"Des",
 ];
 const moduleHealth = [
-	{ label: "Aktif", value: 68, color: "bg-emerald-500" },
+	{ label: "Aktif", value: 68, color: "bg-sky-500" },
 	{ label: "Review", value: 22, color: "bg-sky-500" },
 	{ label: "Draft", value: 10, color: "bg-amber-400" },
 ];
@@ -57,7 +57,7 @@ export default function AdminHomePage() {
 			<section className="flex flex-col gap-5 rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur sm:p-6 lg:rounded-[2rem] lg:p-8">
 				<div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
 					<div>
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
 							Dashboard
 						</p>
 						<h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-[2.7rem]">
@@ -116,11 +116,11 @@ export default function AdminHomePage() {
 						</div>
 						<div className="flex items-center gap-4 text-xs text-slate-500">
 							<span className="inline-flex items-center gap-2">
-								<span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />{" "}
+								<span className="h-2.5 w-2.5 rounded-full bg-sky-500" />{" "}
 								Terbit
 							</span>
 							<span className="inline-flex items-center gap-2">
-								<span className="h-2.5 w-2.5 rounded-full bg-emerald-100" />{" "}
+								<span className="h-2.5 w-2.5 rounded-full bg-sky-100" />{" "}
 								Draft
 							</span>
 						</div>
@@ -138,11 +138,11 @@ export default function AdminHomePage() {
 								>
 									<div className="flex h-[220px] items-end gap-1.5">
 										<div
-											className="w-4 rounded-full bg-emerald-500/20"
+											className="w-4 rounded-full bg-sky-500/20"
 											style={{ height: `${draftHeight}px` }}
 										/>
 										<div
-											className="w-7 rounded-full bg-emerald-500 shadow-[0_14px_26px_-18px_rgba(16,185,129,0.85)]"
+											className="w-7 rounded-full bg-sky-500 shadow-[0_14px_26px_-18px_rgba(56,189,248,0.85)]"
 											style={{ height: `${height}px` }}
 										/>
 									</div>
@@ -236,7 +236,7 @@ export default function AdminHomePage() {
 								</div>
 								<div className="h-2.5 rounded-full bg-slate-200">
 									<div
-										className="h-2.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
+										className="h-2.5 rounded-full bg-gradient-to-r from-sky-500 to-blue-600"
 										style={{ width: `${value}%` }}
 									/>
 								</div>

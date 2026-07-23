@@ -84,7 +84,7 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
 
   return (
     <section className="mx-auto max-w-xl rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Akses Admin</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">Akses Admin</p>
       <h2 className="mt-2 text-2xl font-semibold text-slate-900">Masuk ke CMS Desa Jadimulya</h2>
       <p className="mt-3 text-sm leading-6 text-slate-600">
         Login diperlukan untuk membuka modul organisasi, potensi, sejarah, demografi, berita, dan media desa.
@@ -105,7 +105,7 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
             type="email"
             name="email"
             defaultValue="admin@jadimulya.desa.id"
-            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
             required
           />
         </label>
@@ -115,12 +115,12 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
           <input
             type="password"
             name="password"
-            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+            className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
             required
           />
         </label>
 
-        <button type="submit" className="inline-flex rounded-xl bg-emerald-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800">
+        <button type="submit" className="inline-flex rounded-xl bg-sky-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-800">
           Masuk ke Admin Panel
         </button>
       </form>

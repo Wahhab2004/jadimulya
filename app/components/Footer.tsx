@@ -26,11 +26,10 @@ export default function Footer() {
           </ul>
         </div>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-400">Langganan Warta</p>
-          <p className="mt-4 text-sm leading-7 text-slate-400">Dapatkan informasi perkembangan langsung di email Anda.</p>
-          <div className="mt-5 flex gap-2">
-            <input type="email" placeholder="Email Anda" className="w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm text-white outline-none transition focus:border-emerald-500" />
-            <button className="rounded-3xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Kirim</button>
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-slate-400">Identitas Daerah</p>
+          <p className="mt-4 text-sm leading-7 text-slate-400">Palet visual situs mengikuti biru muda perisai Kabupaten Pangandaran sesuai PRD terbaru.</p>
+          <div className="mt-5 rounded-3xl border border-slate-800 bg-slate-900/80 px-4 py-3 text-sm text-slate-200">
+            Fitur newsletter email dihapus dari desain.
           </div>
         </div>
       </div>

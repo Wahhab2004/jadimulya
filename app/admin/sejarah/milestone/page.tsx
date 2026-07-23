@@ -113,7 +113,7 @@ export default function AdminSejarahMilestonePage() {
               </svg>
             </SectionIcon>
             <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Sejarah Desa</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Sejarah Desa</p>
             <h2 className="mt-1 text-2xl font-semibold text-slate-900">Kelola Milestone</h2>
             <p className="mt-1 text-sm text-slate-600">Tambah dan rapikan fase sejarah.</p>
             </div>
@@ -127,7 +127,7 @@ export default function AdminSejarahMilestonePage() {
       <section className="overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white shadow-[0_18px_40px_-32px_rgba(15,23,42,0.24)]">
         <div className="grid xl:grid-cols-[0.86fr_1.14fr]">
         <form onSubmit={saveMilestone} className="border-b border-slate-200 px-5 py-5 xl:border-b-0 xl:border-r lg:px-6">
-          {notice ? <div className="mb-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div> : null}
+          {notice ? <div className="mb-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">{notice}</div> : null}
           <h3 className="text-lg font-semibold text-slate-900">{editingIndex !== null ? 'Edit Milestone' : 'Tambah Milestone'}</h3>
           <div className="mt-4 space-y-3">
             <input type="text" placeholder="Tahun / Label" value={formState.year} onChange={(event) => setFormState((current) => ({ ...current, year: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
@@ -148,7 +148,7 @@ export default function AdminSejarahMilestonePage() {
             <textarea placeholder="Deskripsi milestone" value={formState.event} onChange={(event) => setFormState((current) => ({ ...current, event: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
           </div>
           <div className="mt-4 flex gap-2">
-            <button type="submit" className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-800">{editingIndex !== null ? 'Simpan Perubahan' : 'Tambah Milestone'}</button>
+            <button type="submit" className="rounded-xl bg-sky-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-800">{editingIndex !== null ? 'Simpan Perubahan' : 'Tambah Milestone'}</button>
             {editingIndex !== null ? <button type="button" onClick={resetForm} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700">Batal</button> : null}
           </div>
         </form>

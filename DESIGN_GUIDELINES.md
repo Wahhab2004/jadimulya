@@ -4,8 +4,8 @@
 Dokumen ini menjelaskan standar desain dan coding untuk frontend proyek Desa Jadimulya. Tujuannya agar semua pengembangan selanjutnya konsisten dan mudah di-scale.
 
 ## Palet Warna
-- Primer: #166534 (Hijau Desa)
-- Sekunder: #153e0b (Hijau Tua)
+- Primer: Biru Pangandaran / sky-600
+- Sekunder: blue-700
 - Netral Gelap: #0f172a
 - Netral Terang: #f8fafc
 - Aksen: #ffffff
@@ -19,9 +19,14 @@ Dokumen ini menjelaskan standar desain dan coding untuk frontend proyek Desa Jad
 
 ## Komponen UI
 - Semua kartu menggunakan: `rounded-[2rem]`, `border`, `shadow-sm`, `bg-white`
-- Tombol utama: `rounded-full`, `bg-emerald-600`, `text-white`
+- Tombol utama: `rounded-full`, `bg-sky-600`, `text-white`
 - Tombol sekunder: `rounded-full`, `border border-slate-200`, `bg-white`
 - Section header: judul besar + subtitle kecil + tautan aksi
+
+## Arah Visual PRD V3
+- Seluruh tampilan mengikuti palet biru muda Pangandaran secara konsisten.
+- Elemen aksen publik dan admin memakai nuansa sky/blue, bukan hijau.
+- Fitur newsletter email dihapus dari desain.
 
 ## Struktur Folder
 - `app/`: halaman utama dan routing

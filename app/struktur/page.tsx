@@ -162,7 +162,7 @@ export default function StrukturOrganisasiPage() {
       <Header />
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">SOTK Desa Jadimulya</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">SOTK Desa Jadimulya</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Struktur Organisasi dan Tata Kelola Pemerintah Desa (SOTK)</h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
             Menampilkan aparatur desa beserta kontak resmi email, telepon/WhatsApp, dan Facebook untuk memudahkan koordinasi warga.
