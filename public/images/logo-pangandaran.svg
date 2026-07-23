@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sky" x1="256" y1="0" x2="256" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#1BA6E8" />
+      <stop offset="1" stop-color="#14A0E2" />
+    </linearGradient>
+  </defs>
+  <path d="M88 22h336c30 0 54 24 54 54v300c0 82-64 140-92 156-32 18-64 18-88 18-24 0-56 0-88-18-28-16-92-74-92-156V76c0-30 24-54 54-54Z" fill="#C71F28"/>
+  <path d="M98 38h316c23 0 42 19 42 42v274c0 76-59 129-84 143-29 17-58 17-78 17s-49 0-78-17c-25-14-84-67-84-143V80c0-23 19-42 42-42Z" fill="url(#sky)" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M84 338h344v36H84z" fill="#ED1C24" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M84 294h344v36H84z" fill="#F6D800" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M84 300c58-34 116-42 172-26 56 16 113 16 188-4v70H84v-40Z" fill="#0EA44B" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M112 276c38-12 72-14 108-6 44 10 80 8 120-6 24-8 45-14 68-16v10c-24 4-46 10-68 18-42 16-82 18-126 8-36-8-70-6-102 4v-12Z" fill="#0B8F43"/>
+  <path d="M242 132c0 0 12-18 16-30 4-12 8-26 8-26s6 14 10 26c4 12 18 30 18 30s-18 4-28 4c-10 0-24-4-24-4Z" fill="#F9E11E" stroke="#2B2B2B" stroke-width="5"/>
+  <circle cx="268" cy="108" r="10" fill="#F9E11E" stroke="#2B2B2B" stroke-width="4"/>
+  <path d="M95 260c14-22 26-36 38-46 18-16 30-28 36-38 8 8 18 18 28 28-14 10-28 24-40 42-10 16-20 38-30 64H90c2-18 2-36 5-50Z" fill="#7B3E1B"/>
+  <path d="M103 244c18-20 36-34 54-46-2 12-2 24-2 36-18 8-34 18-48 32l-4-22Z" fill="#0D8C40"/>
+  <path d="M120 192c6-20 14-30 28-42 14 12 26 24 32 42-18-8-36-8-60 0Z" fill="#0C9746"/>
+  <path d="M144 158c12 2 22 8 30 18 10 12 16 20 18 30-12-2-24-2-36 2-2-16-6-32-12-50Z" fill="#0B7E3A"/>
+  <path d="M310 220c24-14 50-24 82-30 20-4 40-6 60-4v16c-16 0-34 2-54 6-30 6-56 16-82 30-22 12-44 30-64 54-6-22-10-42-10-60 18-10 36-8 68-12Z" fill="#0E9F49" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M364 198c32 0 58 8 80 24 10 8 18 16 24 26-10 0-20 0-30 2-18-18-46-32-74-36v-16Z" fill="#108F42"/>
+  <path d="M390 366c0 22-16 40-36 40-20 0-36-18-36-40s16-40 36-40c20 0 36 18 36 40Z" fill="#F8E12D" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M356 342c0 0-4 28-16 50-12 22-22 36-22 36s14 4 28 4c14 0 28-4 28-4s-10-14-22-36c-12-22-16-50-16-50Z" fill="#F8E12D" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M352 402c6 8 10 18 10 32 0 14-4 24-10 32-6-8-10-18-10-32 0-14 4-24 10-32Z" fill="#F8E12D" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M356 166l8 18 18 2-14 12 4 18-16-10-16 10 4-18-14-12 18-2 8-18Z" fill="#FFE91D" stroke="#2B2B2B" stroke-width="6"/>
+  <path d="M174 458c24 14 54 22 82 22s58-8 82-22" stroke="#C71F28" stroke-width="10" stroke-linecap="round"/>
+  <path d="M24 438l50 26 20-22 4 34 52 0 0-30 18 24 42-18 8-26 18 26 44-20 4-28 20 24 54-18 24-30 30 24 44-20-18 46-56 18-16-22-10 28-58 12-16-20-10 24-66 8-16-20-14 22-62 0-16-24-12 22-58-10-18-28-22 18-54-16Z" fill="#FFE500" stroke="#C71F28" stroke-width="6"/>
+  <path d="M114 444c18 22 44 36 72 36" stroke="#2B2B2B" stroke-width="8" stroke-linecap="round"/>
+  <path d="M398 444c-18 22-44 36-72 36" stroke="#2B2B2B" stroke-width="8" stroke-linecap="round"/>
+  <text x="256" y="96" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700" fill="#FFFFFF" letter-spacing="2">KAB. PANGANDARAN</text>
+  <text x="256" y="486" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700" fill="#2B2B2B" letter-spacing="1">JAYA KARSA MAKARYA PRAJA</text>
+</svg>
