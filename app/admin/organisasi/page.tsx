@@ -207,7 +207,7 @@ export default function AdminOrganisasiPage() {
       return 'Jabatan aparatur wajib diisi.';
     }
 
-    if (!form.photoUrl.trim()) {
+    if (!form.photoUrl?.trim()) {
       return 'Foto aparatur wajib diisi.';
     }
 
