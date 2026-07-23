@@ -73,10 +73,10 @@ const EMPTY_AGE = { label: "", value: 0 };
 const EMPTY_OCC = { label: "", value: 0 };
 
 const INPUT_CLS =
-	"h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-emerald-300";
+	"h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-sky-300";
 const LABEL_CLS = "block text-xs font-semibold text-slate-600 mb-1";
 const BTN_PRIMARY =
-	"h-9 rounded-lg bg-emerald-700 px-4 text-sm font-medium text-white hover:bg-emerald-800 transition disabled:opacity-50";
+	"h-9 rounded-lg bg-sky-700 px-4 text-sm font-medium text-white hover:bg-sky-800 transition disabled:opacity-50";
 const BTN_SECONDARY =
 	"h-9 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 transition";
 const BTN_DANGER =
@@ -451,7 +451,7 @@ export default function AdminStatistikPage() {
 			label: "Total Penduduk",
 			value: formatNumber(summary.totalPopulation),
 			note: "Dihitung otomatis dari data per dusun",
-			noteClass: "text-emerald-700",
+			noteClass: "text-sky-700",
 		},
 		{
 			label: "Kepala Keluarga",
@@ -469,7 +469,7 @@ export default function AdminStatistikPage() {
 			label: "Perempuan",
 			value: formatNumber(summary.female),
 			note: `${femalePercent}% dari populasi`,
-			noteClass: "text-emerald-700",
+			noteClass: "text-sky-700",
 		},
 	];
 
@@ -480,7 +480,7 @@ export default function AdminStatistikPage() {
 			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
 				<div className="flex flex-wrap items-start justify-between gap-4">
 					<div className="max-w-2xl">
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">
+						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
 							Modul Statistik
 						</p>
 						<h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
@@ -531,7 +531,7 @@ export default function AdminStatistikPage() {
 						onClick={() => setActiveTab(tab.id)}
 						className={`h-9 rounded-lg px-4 text-sm font-medium transition ${
 							activeTab === tab.id
-								? "bg-emerald-700 text-white shadow"
+								? "bg-sky-700 text-white shadow"
 								: "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
 						}`}
 					>
@@ -565,9 +565,9 @@ export default function AdminStatistikPage() {
 								</div>
 							</div>
 							<div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-								<div className="rounded-2xl bg-emerald-50 px-4 py-3">
+								<div className="rounded-2xl bg-sky-50 px-4 py-3">
 									<p className="font-semibold text-slate-900">Laki-laki</p>
-									<p className="text-emerald-700">{malePercent}%</p>
+									<p className="text-sky-700">{malePercent}%</p>
 								</div>
 								<div className="rounded-2xl bg-sky-50 px-4 py-3">
 									<p className="font-semibold text-slate-900">Perempuan</p>
@@ -597,7 +597,7 @@ export default function AdminStatistikPage() {
 									<button
 										type="button"
 										onClick={() => setActiveTab("usia")}
-										className="font-semibold text-emerald-700 underline"
+										className="font-semibold text-sky-700 underline"
 									>
 										Kelompok Usia
 									</button>
@@ -618,7 +618,7 @@ export default function AdminStatistikPage() {
 											className="flex h-full flex-col items-center justify-end gap-2"
 										>
 											<div
-												className="w-full rounded-md bg-emerald-700/95"
+												className="w-full rounded-md bg-sky-700/95"
 												style={{
 													height: `${Math.max(20, (item.value / maxAgeValue) * 200)}px`,
 												}}
@@ -652,7 +652,7 @@ export default function AdminStatistikPage() {
 								<button
 									type="button"
 									onClick={() => setActiveTab("pekerjaan")}
-									className="font-semibold text-emerald-700 underline"
+									className="font-semibold text-sky-700 underline"
 								>
 									Jenis Pekerjaan
 								</button>
@@ -667,7 +667,7 @@ export default function AdminStatistikPage() {
 									>
 										<div className="h-1.5 rounded-full bg-slate-200">
 											<div
-												className="h-1.5 rounded-full bg-emerald-600"
+												className="h-1.5 rounded-full bg-sky-600"
 												style={{
 													width: `${Math.max(4, Math.round((item.value / maxOccValue) * 100))}%`,
 												}}
@@ -750,7 +750,7 @@ export default function AdminStatistikPage() {
 												<td className="px-4 py-3 sm:px-5">
 													<div className="h-1.5 w-20 rounded-full bg-slate-200">
 														<div
-															className="h-1.5 rounded-full bg-emerald-700"
+															className="h-1.5 rounded-full bg-sky-700"
 															style={{
 																width: `${Math.round((total / maxDusunTotal) * 100)}%`,
 															}}
@@ -795,14 +795,14 @@ export default function AdminStatistikPage() {
 								value={searchTerm}
 								onChange={(e) => setSearchTerm(e.target.value)}
 								placeholder="Cari dusun..."
-								className="h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-emerald-300"
+								className="h-9 rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-sky-300"
 							/>
 							<button
 								type="button"
 								onClick={() => setShowPadatOnly((v) => !v)}
 								className={`h-9 rounded-lg px-3 text-sm font-medium transition ${
 									showPadatOnly
-										? "bg-emerald-700 text-white"
+										? "bg-sky-700 text-white"
 										: "bg-slate-100 text-slate-700 hover:bg-slate-200"
 								}`}
 							>
@@ -946,7 +946,7 @@ export default function AdminStatistikPage() {
 									<tr
 										key={item.id}
 										className={`border-t border-slate-200 text-slate-700 ${
-											editingDusunId === item.id ? "bg-emerald-50" : "bg-white"
+											editingDusunId === item.id ? "bg-sky-50" : "bg-white"
 										}`}
 									>
 										<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
@@ -1100,7 +1100,7 @@ export default function AdminStatistikPage() {
 								key={item.id}
 								className={`flex items-center gap-4 rounded-xl border px-4 py-3 ${
 									editingAgeId === item.id
-										? "border-emerald-200 bg-emerald-50"
+										? "border-sky-200 bg-sky-50"
 										: "border-slate-200 bg-white"
 								}`}
 							>
@@ -1110,7 +1110,7 @@ export default function AdminStatistikPage() {
 								<div className="flex-1">
 									<div className="h-2 rounded-full bg-slate-100">
 										<div
-											className="h-2 rounded-full bg-emerald-600"
+											className="h-2 rounded-full bg-sky-600"
 											style={{
 												width: `${Math.max(4, Math.round((item.value / maxAgeValue) * 100))}%`,
 											}}
@@ -1234,7 +1234,7 @@ export default function AdminStatistikPage() {
 								key={item.id}
 								className={`flex items-center gap-4 rounded-xl border px-4 py-3 ${
 									editingOccId === item.id
-										? "border-emerald-200 bg-emerald-50"
+										? "border-sky-200 bg-sky-50"
 										: "border-slate-200 bg-white"
 								}`}
 							>
@@ -1244,7 +1244,7 @@ export default function AdminStatistikPage() {
 								<div className="flex-1">
 									<div className="h-2 rounded-full bg-slate-100">
 										<div
-											className="h-2 rounded-full bg-emerald-600"
+											className="h-2 rounded-full bg-sky-600"
 											style={{
 												width: `${Math.max(4, Math.round((item.value / maxOccValue) * 100))}%`,
 											}}

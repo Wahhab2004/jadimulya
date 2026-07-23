@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { initialSejarahContent, loadStoredSejarahContent, saveSejarahContent, type SejarahContent } from '@/lib/sejarah-store';
 
 function SectionIcon({ children }: { children: React.ReactNode }) {
-  return <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">{children}</span>;
+  return <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">{children}</span>;
 }
 
 export default function AdminSejarahKontenPage() {
@@ -52,7 +52,7 @@ export default function AdminSejarahKontenPage() {
               </svg>
             </SectionIcon>
             <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Sejarah Desa</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Sejarah Desa</p>
             <h2 className="mt-1 text-2xl font-semibold text-slate-900">Edit Konten Utama</h2>
             <p className="mt-1 text-sm text-slate-600">Kelola isi utama dalam satu panel yang lebih rapi.</p>
             </div>
@@ -66,7 +66,7 @@ export default function AdminSejarahKontenPage() {
       </section>
 
       <form onSubmit={saveContent} className="overflow-hidden rounded-[1.8rem] border border-slate-200 bg-white shadow-[0_18px_40px_-32px_rgba(15,23,42,0.24)]">
-        {notice ? <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{notice}</div> : null}
+        {notice ? <div className="rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">{notice}</div> : null}
 
         <section className="space-y-4 border-b border-slate-200 px-5 py-5 lg:px-6">
           <div className="flex items-center gap-3">
@@ -86,15 +86,15 @@ export default function AdminSejarahKontenPage() {
           <div className="grid gap-3 md:grid-cols-2">
             <label className="block md:col-span-2">
               <span className="mb-2 block text-sm font-medium text-slate-700">Hero Eyebrow</span>
-              <input type="text" value={content.heroEyebrow} onChange={(event) => setContent((current) => ({ ...current, heroEyebrow: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+              <input type="text" value={content.heroEyebrow} onChange={(event) => setContent((current) => ({ ...current, heroEyebrow: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
             </label>
             <label className="block md:col-span-2">
               <span className="mb-2 block text-sm font-medium text-slate-700">Hero Title</span>
-              <input type="text" value={content.heroTitle} onChange={(event) => setContent((current) => ({ ...current, heroTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+              <input type="text" value={content.heroTitle} onChange={(event) => setContent((current) => ({ ...current, heroTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
             </label>
             <label className="block md:col-span-2">
               <span className="mb-2 block text-sm font-medium text-slate-700">Hero Description</span>
-              <textarea value={content.heroDescription} onChange={(event) => setContent((current) => ({ ...current, heroDescription: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-300" />
+              <textarea value={content.heroDescription} onChange={(event) => setContent((current) => ({ ...current, heroDescription: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
             </label>
           </div>
         </section>
@@ -116,11 +116,11 @@ export default function AdminSejarahKontenPage() {
           <div className="grid gap-3">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">Judul Visi</span>
-              <input type="text" value={content.visiTitle} onChange={(event) => setContent((current) => ({ ...current, visiTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+              <input type="text" value={content.visiTitle} onChange={(event) => setContent((current) => ({ ...current, visiTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
             </label>
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">Deskripsi Visi</span>
-              <textarea value={content.visiDescription} onChange={(event) => setContent((current) => ({ ...current, visiDescription: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-300" />
+              <textarea value={content.visiDescription} onChange={(event) => setContent((current) => ({ ...current, visiDescription: event.target.value }))} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
             </label>
           </div>
         </section>
@@ -143,16 +143,16 @@ export default function AdminSejarahKontenPage() {
           <div className="grid gap-3">
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">Judul Asal-usul</span>
-              <input type="text" value={content.originTitle} onChange={(event) => setContent((current) => ({ ...current, originTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+              <input type="text" value={content.originTitle} onChange={(event) => setContent((current) => ({ ...current, originTitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
             </label>
             <label className="block">
               <span className="mb-2 block text-sm font-medium text-slate-700">Subtitle Asal-usul</span>
-              <input type="text" value={content.originSubtitle} onChange={(event) => setContent((current) => ({ ...current, originSubtitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-emerald-300" />
+              <input type="text" value={content.originSubtitle} onChange={(event) => setContent((current) => ({ ...current, originSubtitle: event.target.value }))} className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-sky-300" />
             </label>
             {content.originParagraphs.map((paragraph, index) => (
               <label key={index} className="block">
                 <span className="mb-2 block text-sm font-medium text-slate-700">Paragraf {index + 1}</span>
-                <textarea value={paragraph} onChange={(event) => updateOriginParagraph(index, event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-300" />
+                <textarea value={paragraph} onChange={(event) => updateOriginParagraph(index, event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
               </label>
             ))}
           </div>
@@ -174,12 +174,12 @@ export default function AdminSejarahKontenPage() {
 
           <label className="block">
             <span className="mb-2 block text-sm font-medium text-slate-700">Daftar Dusun</span>
-            <textarea value={content.dusunSaatIni.join('\n')} onChange={(event) => handleDusunChange(event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-emerald-300" />
+            <textarea value={content.dusunSaatIni.join('\n')} onChange={(event) => handleDusunChange(event.target.value)} className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-sky-300" />
           </label>
         </section>
 
         <div className="flex justify-end border-t border-slate-200 px-5 py-4 lg:px-6">
-          <button type="submit" className="rounded-xl bg-emerald-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-800">
+    		  <button type="submit" className="rounded-xl bg-sky-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-800">
             Simpan Konten
           </button>
         </div>

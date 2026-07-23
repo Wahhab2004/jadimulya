@@ -125,7 +125,7 @@ export default function SejarahPage() {
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
         <div className="grid gap-6 sm:gap-8 lg:grid-cols-[240px_minmax(0,1fr)] xl:grid-cols-[260px_minmax(0,1fr)]">
           <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 lg:hidden">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">Daftar Isi</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sky-700">Daftar Isi</p>
             <nav className="mt-3 flex flex-wrap gap-2">
               {daftarIsi.map((item) => {
                 const isActive = activeSection === item.id;
@@ -136,8 +136,8 @@ export default function SejarahPage() {
                     href={`#${item.id}`}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
                       isActive
-                        ? 'border-emerald-300 bg-emerald-50 text-emerald-800'
-                        : 'border-slate-200 bg-white text-slate-600 hover:border-emerald-200 hover:text-emerald-700'
+                        ? 'border-sky-300 bg-sky-50 text-sky-800'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-sky-200 hover:text-sky-700'
                     }`}
                   >
                     {item.label}
@@ -149,7 +149,7 @@ export default function SejarahPage() {
 
           <aside className="hidden lg:block">
             <div className="sticky top-24 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">Daftar Isi</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-700">Daftar Isi</p>
               <nav className="mt-4 space-y-1">
                 {daftarIsi.map((item) => {
                   const isActive = activeSection === item.id;
@@ -160,8 +160,8 @@ export default function SejarahPage() {
                       href={`#${item.id}`}
                       className={`block rounded-xl px-3 py-2 text-sm transition ${
                         isActive
-                          ? 'bg-emerald-50 font-medium text-emerald-700'
-                          : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-700'
+                          ? 'bg-sky-50 font-medium text-sky-700'
+                          : 'text-slate-600 hover:bg-sky-50 hover:text-sky-700'
                       }`}
                       aria-current={isActive ? 'location' : undefined}
                     >
@@ -176,7 +176,7 @@ export default function SejarahPage() {
                 <ol className="mt-4 space-y-4">
                   {liniMasaUtama.map((item) => (
                     <li key={item.year} className="flex gap-3">
-                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-600" aria-hidden="true" />
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-sky-600" aria-hidden="true" />
                       <div>
                         <p className="text-sm font-semibold text-slate-900">{item.year}</p>
                         <p className="text-xs text-slate-600">{item.label}</p>
@@ -190,7 +190,7 @@ export default function SejarahPage() {
 
           <div className="space-y-5 sm:space-y-6">
             <section className="rounded-[1.75rem] border border-slate-200 bg-white p-5 shadow-sm sm:rounded-[2rem] sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Napak Tilas Jadimulya</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">Napak Tilas Jadimulya</p>
               <h1 className="mt-3 text-2xl font-semibold leading-tight tracking-tight text-slate-900 sm:text-4xl">
                 {content.heroTitle}
               </h1>
@@ -231,18 +231,18 @@ export default function SejarahPage() {
 
                   <div className="mx-auto h-8 w-px bg-slate-300" aria-hidden="true" />
 
-                  <div className="mx-auto rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-3 text-sm font-semibold text-emerald-800 sm:text-base">
+                  <div className="mx-auto rounded-2xl border border-sky-200 bg-sky-50 px-6 py-3 text-sm font-semibold text-sky-800 sm:text-base">
                     1928 - Desa Jadimulya
                   </div>
 
                   <div className="mx-auto h-8 w-px bg-slate-300" aria-hidden="true" />
 
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm text-slate-700">
+                    <div className="rounded-2xl border border-sky-200 bg-white px-4 py-3 text-sm text-slate-700">
                       <p className="font-semibold text-slate-900">Desa Jadimulya (Induk)</p>
                       <p className="mt-1 text-xs text-slate-600">Jumleng, Cigintung, Ciranto</p>
                     </div>
-                    <div className="rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm text-slate-700">
+                    <div className="rounded-2xl border border-sky-200 bg-white px-4 py-3 text-sm text-slate-700">
                       <p className="font-semibold text-slate-900">1979 - Desa Jadikarya</p>
                       <p className="mt-1 text-xs text-slate-600">Jajaway, Wangkalronyok</p>
                     </div>
@@ -267,7 +267,7 @@ export default function SejarahPage() {
                     <p className="text-sm font-semibold text-slate-900">Struktur Dusun Desa Jadimulya Saat Ini</p>
                     <div className="mt-3 flex flex-wrap justify-center gap-2">
                       {content.dusunSaatIni.map((dusun) => (
-                        <span key={dusun} className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-800">
+                        <span key={dusun} className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-800">
                           {dusun}
                         </span>
                       ))}
@@ -279,7 +279,7 @@ export default function SejarahPage() {
               <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {content.milestones.map((item, index) => (
                   <article key={`${item.year}-${index}`} className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-700">{item.year}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">{item.year}</p>
                     <p className="mt-2 text-[15px] leading-7 text-slate-700 sm:text-base">{item.event}</p>
                     {item.imageUrl ? (
                       <div className="relative mt-4 h-40 w-full overflow-hidden rounded-xl border border-slate-200">
@@ -304,7 +304,7 @@ export default function SejarahPage() {
               />
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {content.dusunSaatIni.map((dusun) => (
-                  <div key={dusun} className="rounded-2xl border border-emerald-100 bg-emerald-50/60 px-4 py-3 text-sm font-medium text-emerald-800">
+                  <div key={dusun} className="rounded-2xl border border-sky-100 bg-sky-50/60 px-4 py-3 text-sm font-medium text-sky-800">
                     {dusun}
                   </div>
                 ))}

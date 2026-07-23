@@ -86,7 +86,7 @@ export default function AdminPotensiForm({
 					onChange={(event) =>
 						onChange({ ...formState, name: event.target.value })
 					}
-					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 					required
 				/>
 			</label>
@@ -103,7 +103,7 @@ export default function AdminPotensiForm({
 							category: event.target.value as AdminPotensiCategory,
 						})
 					}
-					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 				>
 					<option value="PERTANIAN">Pertanian</option>
 					<option value="PARIWISATA">Pariwisata</option>
@@ -119,7 +119,7 @@ export default function AdminPotensiForm({
 					onChange={(event) =>
 						onChange({ ...formState, shortDesc: event.target.value })
 					}
-					className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 					required
 				/>
 			</label>
@@ -134,7 +134,7 @@ export default function AdminPotensiForm({
 					onChange={(event) =>
 						onChange({ ...formState, coverImage: event.target.value })
 					}
-					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 				/>
 			</label>
 
@@ -148,7 +148,7 @@ export default function AdminPotensiForm({
 						if (!event.target.value) return;
 						onChange({ ...formState, coverImage: event.target.value });
 					}}
-					className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="h-11 w-full rounded-xl border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 				>
 					<option value="">Pilih gambar tersimpan</option>
 					{mediaItems.map((item) => (
@@ -168,7 +168,7 @@ export default function AdminPotensiForm({
 					onChange={(event) =>
 						onChange({ ...formState, fullDesc: event.target.value })
 					}
-					className="min-h-32 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-emerald-300"
+					className="min-h-32 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 				/>
 			</label>
 
@@ -179,7 +179,7 @@ export default function AdminPotensiForm({
 					onChange={(event) =>
 						onChange({ ...formState, isHighlight: event.target.checked })
 					}
-					className="h-4 w-4 rounded border-slate-300 text-emerald-700"
+					className="h-4 w-4 rounded border-slate-300 text-sky-700"
 				/>
 				Tampilkan sebagai highlight di halaman utama
 			</label>
@@ -187,7 +187,7 @@ export default function AdminPotensiForm({
 			<div className="flex flex-wrap gap-2">
 				<button
 					type="submit"
-					className="rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-800"
+					className="rounded-full bg-sky-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-800"
 				>
 					{submitLabel}
 				</button>

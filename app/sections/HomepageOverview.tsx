@@ -30,7 +30,7 @@ export default function HomepageOverview({ features, news }: HomepageOverviewPro
             <h3 className="text-xl font-semibold text-slate-900">Program Digitalisasi Desa</h3>
             <p className="mt-4 text-slate-600">Akses informasi desa dipusatkan dalam portal resmi agar warga mudah menemukan data penting secara cepat.</p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <a href="/potensi" className="inline-flex items-center justify-center rounded-full bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">Jelajahi Potensi Desa</a>
+              <a href="/potensi" className="inline-flex items-center justify-center rounded-full bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-500">Jelajahi Potensi Desa</a>
               <a href="#" className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-50">Unduh Katalog Potensi (PDF/Docs)</a>
             </div>
           </div>

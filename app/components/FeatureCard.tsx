@@ -18,7 +18,7 @@ export default function FeatureCard({ category, title, description, imageUrl }: 
         )}
       </div>
       <div className="space-y-4 p-6">
-        <span className="inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">{category}</span>
+        <span className="inline-flex rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-sky-700">{category}</span>
         <h3 className="text-xl font-semibold text-slate-900">{title}</h3>
         <p className="text-slate-600">{description}</p>
       </div>

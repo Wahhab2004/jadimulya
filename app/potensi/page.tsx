@@ -11,7 +11,7 @@ const categoryFilters = ['Semua Potensi', 'Pertanian', 'Wisata'] as const;
 type CategoryFilter = (typeof categoryFilters)[number];
 
 const categoryBadgeStyles: Record<PotensiCategory, string> = {
-  Pertanian: 'bg-emerald-100 text-emerald-700',
+  Pertanian: 'bg-sky-100 text-sky-700',
   Wisata: 'bg-amber-100 text-amber-700',
 };
 
@@ -104,7 +104,7 @@ export default function PotensiPage() {
 
           <div className="absolute inset-0 mx-auto flex h-full w-full max-w-7xl items-center px-4 sm:px-6 lg:px-8">
             <div className="max-w-2xl text-white">
-              <span className="inline-flex rounded-full bg-emerald-600 px-4 py-1 text-xs font-semibold tracking-[0.08em]">
+              <span className="inline-flex rounded-full bg-sky-600 px-4 py-1 text-xs font-semibold tracking-[0.08em]">
                 Eksplorasi Desa
               </span>
               <h1 className="mt-4 text-4xl font-semibold leading-tight sm:text-5xl">Potensi dan Keunggulan Lokal Jadimulya</h1>
@@ -130,7 +130,7 @@ export default function PotensiPage() {
                     }}
                     className={`rounded-full px-5 py-2 text-xs font-semibold transition sm:text-sm ${
                       isActive
-                        ? 'bg-emerald-700 text-white shadow-[0_10px_24px_-16px_rgba(6,95,70,0.9)]'
+                        ? 'bg-sky-700 text-white shadow-[0_10px_24px_-16px_rgba(37,99,235,0.9)]'
                         : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                     }`}
                   >
@@ -160,20 +160,20 @@ export default function PotensiPage() {
                 </div>
 
                 <div className="p-4 sm:p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700">{item.tag}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-sky-700">{item.tag}</p>
                   <h3 className="mt-2 text-[1.7rem] font-semibold leading-tight text-slate-900">{item.title}</h3>
                   <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-600">{item.description}</p>
 
                   <div className="mt-5 flex items-center gap-2">
                     <button
                       type="button"
-                      className="inline-flex flex-1 items-center justify-center rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-800"
+                      className="inline-flex flex-1 items-center justify-center rounded-lg bg-sky-700 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-800"
                     >
                       Lihat Detail
                     </button>
                     <button
                       type="button"
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-200 text-emerald-700 transition hover:bg-emerald-50"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-sky-200 text-sky-700 transition hover:bg-sky-50"
                       aria-label={`Aksi tambahan ${item.title}`}
                     >
                       {cardActionIcons[item.category]}
@@ -189,7 +189,7 @@ export default function PotensiPage() {
               type="button"
               onClick={() => setVisibleCount((count) => count + 3)}
               disabled={!hasMore}
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-700 px-7 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-700 hover:text-white disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400 disabled:hover:bg-transparent"
+              className="inline-flex items-center gap-2 rounded-full border border-sky-700 px-7 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-700 hover:text-white disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400 disabled:hover:bg-transparent"
             >
               Tampilkan Lebih Banyak
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -200,17 +200,17 @@ export default function PotensiPage() {
         </section>
 
         <section className="mx-auto mt-10 max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[2rem] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-emerald-50/35 p-8 text-center sm:p-10">
+          <div className="rounded-[2rem] border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-sky-50/35 p-8 text-center sm:p-10">
             <h2 className="text-3xl font-semibold text-slate-900">Ingin Menjadi Mitra Kami?</h2>
             <p className="mx-auto mt-4 max-w-2xl text-slate-600">
               Kami membuka peluang kolaborasi bagi investor, distributor, maupun wisatawan yang ingin berkontribusi dalam
               memajukan potensi Desa Jadimulya.
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <button type="button" className="rounded-full bg-emerald-700 px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_22px_-16px_rgba(6,95,70,0.85)] transition hover:bg-emerald-800">
+              <button type="button" className="rounded-full bg-sky-700 px-6 py-3 text-sm font-semibold text-white shadow-[0_12px_22px_-16px_rgba(37,99,235,0.85)] transition hover:bg-sky-800">
                 Hubungi Pemerintah Desa
               </button>
-              <button type="button" className="rounded-full border border-emerald-700 px-6 py-3 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-700 hover:text-white">
+              <button type="button" className="rounded-full border border-sky-700 px-6 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-700 hover:text-white">
                 Unduh Katalog Potensi (PDF)
               </button>
             </div>

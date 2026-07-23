@@ -18,7 +18,7 @@ export default function SejarahSection({ sejarah }: SejarahSectionProps) {
           <div className="space-y-4">
             {sejarah.milestones.map((item) => (
               <div key={item.year} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-700">{item.year}</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-700">{item.year}</p>
                 <p className="mt-3 text-slate-700">{item.description}</p>
               </div>
             ))}

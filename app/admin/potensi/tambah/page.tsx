@@ -78,7 +78,7 @@ export default function AdminPotensiTambahPage() {
   return (
     <div className="space-y-4">
       <section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-700">Potensi Desa</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">Potensi Desa</p>
         <h2 className="mt-2 text-2xl font-semibold text-slate-900">Tambah Potensi Baru</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">Isi satu data potensi dalam halaman khusus agar lebih fokus dan minim salah input.</p>
       </section>

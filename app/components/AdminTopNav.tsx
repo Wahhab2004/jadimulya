@@ -24,7 +24,7 @@ export default function AdminTopNav({ items }: AdminTopNavProps) {
 
   return (
     <div className="min-w-0 flex-1 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <nav className="flex min-w-max items-center gap-1 rounded-full border border-emerald-100/80 bg-white/90 p-1 shadow-[0_16px_36px_-26px_rgba(15,23,42,0.28)] backdrop-blur">
+      <nav className="flex min-w-max items-center gap-1 rounded-full border border-sky-100/80 bg-white/90 p-1 shadow-[0_16px_36px_-26px_rgba(15,23,42,0.28)] backdrop-blur">
         {items.map((item) => {
           const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
           const iconKey = item.shortLabel ?? item.label;
@@ -35,8 +35,8 @@ export default function AdminTopNav({ items }: AdminTopNavProps) {
               href={item.href}
               className={`inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition ${
                 isActive
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-[0_16px_24px_-18px_rgba(5,150,105,0.9)]'
-                  : 'text-slate-600 hover:bg-emerald-50 hover:text-emerald-800'
+                  ? 'bg-gradient-to-r from-sky-600 to-blue-700 text-white shadow-[0_16px_24px_-18px_rgba(37,99,235,0.9)]'
+                  : 'text-slate-600 hover:bg-sky-50 hover:text-sky-800'
               }`}
             >
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden="true">

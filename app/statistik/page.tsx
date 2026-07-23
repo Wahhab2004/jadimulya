@@ -170,7 +170,7 @@ export default function StatistikPage() {
       label: 'Total Penduduk',
       value: numberFormat(dataset.summary.totalPopulation),
       note: 'Ringkasan data terbaru',
-      noteClass: 'text-emerald-700',
+      noteClass: 'text-sky-700',
     },
     {
       label: 'Kepala Keluarga',
@@ -188,7 +188,7 @@ export default function StatistikPage() {
       label: 'Perempuan',
       value: numberFormat(dataset.summary.female),
       note: `${femalePercent}% dari total`,
-      noteClass: 'text-emerald-700',
+      noteClass: 'text-sky-700',
     },
   ];
 
@@ -198,7 +198,7 @@ export default function StatistikPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
         <section className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-700">Data Publik Desa</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">Data Publik Desa</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Statistik Ringkas Desa Jadimulya</h1>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
             Ringkasan statistik ini menampilkan total penduduk, distribusi gender, jenis pekerjaan,
@@ -228,9 +228,9 @@ export default function StatistikPage() {
               </div>
             </div>
             <div className="mt-6 grid grid-cols-2 gap-4 text-sm">
-              <div className="rounded-2xl bg-emerald-50 px-4 py-3">
+              <div className="rounded-2xl bg-sky-50 px-4 py-3">
                 <p className="font-semibold text-slate-900">Laki-laki</p>
-                <p className="mt-1 text-emerald-700">{malePercent}%</p>
+                <p className="mt-1 text-sky-700">{malePercent}%</p>
               </div>
               <div className="rounded-2xl bg-sky-50 px-4 py-3">
                 <p className="font-semibold text-slate-900">Perempuan</p>
@@ -261,7 +261,7 @@ export default function StatistikPage() {
                         <p className="text-lg font-semibold text-slate-900">{numberFormat(total)} jiwa</p>
                       </div>
                       <div className="mt-3 h-2 rounded-full bg-slate-200">
-                        <div className="h-2 rounded-full bg-emerald-600" style={{ width: `${Math.round((total / maxDusunTotal) * 100)}%` }} />
+                        <div className="h-2 rounded-full bg-sky-600" style={{ width: `${Math.round((total / maxDusunTotal) * 100)}%` }} />
                       </div>
                     </div>
                   );
@@ -286,7 +286,7 @@ export default function StatistikPage() {
                       <span className="font-medium text-slate-900">{numberFormat(item.value)}</span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-200">
-                      <div className="h-2 rounded-full bg-emerald-600" style={{ width: `${Math.max(4, Math.round((item.value / maxOccupation) * 100))}%` }} />
+                      <div className="h-2 rounded-full bg-sky-600" style={{ width: `${Math.max(4, Math.round((item.value / maxOccupation) * 100))}%` }} />
                     </div>
                   </div>
                 ))}

@@ -86,7 +86,7 @@ export const adminNavItems: AdminNavItem[] = [
     description: 'Ringkasan statistik desa.',
     shortLabel: 'Statistik',
     icon: 'statistik',
-    phase: 'MVP',
-    enabled: true,
+    phase: 'Next',
+    enabled: false,
   },
 ];
