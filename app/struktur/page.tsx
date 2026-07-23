@@ -5,10 +5,10 @@ import { useEffect, useMemo, useState } from "react";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
 import {
-  type OrganisasiGroup,
-  type OrganisasiMember,
-} from '@/lib/organisasi-store';
-import { getOrganisasi, type BackendOrganisasiItem } from '@/lib/api';
+	type OrganisasiGroup,
+	type OrganisasiMember,
+} from "@/lib/organisasi-store";
+import { getOrganisasi, type BackendOrganisasiItem } from "@/lib/api";
 
 function mapTierToGroup(item: BackendOrganisasiItem): OrganisasiGroup {
 	if (item.tier === "KEPALA_DESA") {
@@ -226,10 +226,10 @@ function DetailDialog({
 		return null;
 	}
 
-	const waNumber =
-		member.contact.whatsapp || member.contact.phone
-			? cleanPhoneForWa(member.contact.whatsapp || member.contact.phone)
-			: "";
+	
+	const rawPhone = member.contact.whatsapp || member.contact.phone;
+	const waNumber = rawPhone ? cleanPhoneForWa(rawPhone) : "";
+
 
 	return (
 		<div
@@ -314,27 +314,31 @@ function DetailDialog({
 }
 
 export default function StrukturOrganisasiPage() {
-  const [members, setMembers] = useState<OrganisasiMember[]>([]);
-  const [selectedMember, setSelectedMember] = useState<OrganisasiMember | null>(null);
+	const [members, setMembers] = useState<OrganisasiMember[]>([]);
+	const [selectedMember, setSelectedMember] = useState<OrganisasiMember | null>(
+		null,
+	);
 
-  useEffect(() => {
-   
-    void (async () => {
-      try {
-        const apiMembers = await getOrganisasi();
-        const mappedMembers = apiMembers.map((item) => ({
-          id: item.id,
-          name: item.fullName,
-          position: item.position,
-          group: mapTierToGroup(item),
-          photoUrl: item.photoUrl ?? '',
-          contact: {
-            email: item.email ?? '',
-            phone: item.phone ?? '',
-            whatsapp: item.phone ?? '',
-            facebook: item.facebookUrl ?? '',
-          },
-        } satisfies OrganisasiMember));
+	useEffect(() => {
+		void (async () => {
+			try {
+				const apiMembers = await getOrganisasi();
+				const mappedMembers = apiMembers.map(
+					(item) =>
+						({
+							id: item.id,
+							name: item.fullName,
+							position: item.position,
+							group: mapTierToGroup(item),
+							photoUrl: item.photoUrl ?? "",
+							contact: {
+								email: item.email ?? "",
+								phone: item.phone ?? "",
+								whatsapp: item.phone ?? "",
+								facebook: item.facebookUrl ?? "",
+							},
+						}) satisfies OrganisasiMember,
+				);
 
 				if (mappedMembers.length > 0) {
 					setMembers(mappedMembers);
