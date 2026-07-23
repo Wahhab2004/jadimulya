@@ -5,8 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Footer from '@/app/components/Footer';
 import Header from '@/app/components/Header';
 import {
-  initialOrganisasiMembers,
-  loadStoredOrganisasiMembers,
   type OrganisasiGroup,
   type OrganisasiMember,
 } from '@/lib/organisasi-store';
@@ -104,13 +102,11 @@ function DetailDialog({ member, onClose }: { member: OrganisasiMember | null; on
 }
 
 export default function StrukturOrganisasiPage() {
-  const [members, setMembers] = useState<OrganisasiMember[]>(initialOrganisasiMembers);
+  const [members, setMembers] = useState<OrganisasiMember[]>([]);
   const [selectedMember, setSelectedMember] = useState<OrganisasiMember | null>(null);
 
   useEffect(() => {
-    const localMembers = loadStoredOrganisasiMembers();
-    setMembers(localMembers);
-
+   
     void (async () => {
       try {
         const apiMembers = await getOrganisasi();
