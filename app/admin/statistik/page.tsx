@@ -41,13 +41,6 @@ type DusunFormState = Omit<DusunItem, "id">;
 type OccupationFormState = Omit<OccupationItem, "id">;
 
 const CURRENT_YEAR = new Date().getFullYear();
-const DEFAULT_DUSUN_NAMES = [
-	"Dusun Ciranto",
-	"Dusun Cisagu",
-	"Dusun Mulyasari",
-	"Dusun Sidikmulya",
-	"Dusun Parinenggang",
-];
 
 const EMPTY_DUSUN: DusunFormState = {
 	dusunName: "",
@@ -99,62 +92,8 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 	return json.data;
 }
 
-function makeDefaultDusunRows(): DusunItem[] {
-	return DEFAULT_DUSUN_NAMES.map((dusunName, index) => ({
-		id: `dusun-default-${index + 1}`,
-		dusunName,
-		totalKK: 0,
-		maleCount: 0,
-		femaleCount: 0,
-		dataYear: CURRENT_YEAR,
-		sortOrder: index + 1,
-	}));
-}
-
-function normalizeDusunItems(items: DusunItem[]): DusunItem[] {
-	const mapped = new Map<string, DusunItem>();
-
-	for (const item of items) {
-		const normalizedName = item.dusunName.trim().toLowerCase();
-		if (!normalizedName) {
-			continue;
-		}
-
-		mapped.set(normalizedName, {
-			...item,
-			dusunName: item.dusunName.trim(),
-			dataYear: toNum(item.dataYear) || CURRENT_YEAR,
-			totalKK: toNum(item.totalKK),
-			maleCount: toNum(item.maleCount),
-			femaleCount: toNum(item.femaleCount),
-			sortOrder: item.sortOrder,
-		});
-	}
-
-	return DEFAULT_DUSUN_NAMES.map((dusunName, index) => {
-		const existing = mapped.get(dusunName.toLowerCase());
-		if (existing) {
-			return {
-				...existing,
-				id: existing.id || `dusun-${slugify(dusunName)}`,
-				sortOrder: existing.sortOrder ?? index + 1,
-			};
-		}
-
-		return {
-			id: `dusun-${slugify(dusunName)}`,
-			dusunName,
-			totalKK: 0,
-			maleCount: 0,
-			femaleCount: 0,
-			dataYear: CURRENT_YEAR,
-			sortOrder: index + 1,
-		};
-	});
-}
-
 export default function AdminStatistikPage() {
-	const [dusun, setDusun] = useState<DusunItem[]>(makeDefaultDusunRows());
+	const [dusun, setDusun] = useState<DusunItem[]>([]);
 	const [occupations, setOccupations] = useState<OccupationItem[]>([]);
 	const [ringkasanApi, setRingkasanApi] = useState<RingkasanItem | null>(null);
 	const [updatedAt, setUpdatedAt] = useState(
@@ -223,10 +162,9 @@ export default function AdminStatistikPage() {
 					} as DusunItem;
 				},
 			);
-			setDusun(normalizeDusunItems(normalized));
+			setDusun(normalized);
 			setUpdatedAt(new Date().toISOString().slice(0, 10));
 		} catch {
-			setDusun(makeDefaultDusunRows());
 			showAdminToast("Gagal memuat data dusun dari backend.", "error");
 		}
 	}
