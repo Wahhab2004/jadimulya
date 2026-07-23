@@ -4,8 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type DusunItem = {
 	id: string;
 	dusunName: string;
@@ -14,12 +12,6 @@ type DusunItem = {
 	femaleCount: number;
 	dataYear: number;
 	sortOrder?: number;
-};
-
-type AgeGroupItem = {
-	id: string;
-	label: string;
-	value: number;
 };
 
 type OccupationItem = {
@@ -34,43 +26,37 @@ type BackendResponse<T> = {
 	data: T;
 };
 
-type ActiveTab = "overview" | "dusun" | "usia" | "pekerjaan";
+type RingkasanItem = {
+	totalPopulation?: number;
+	totalFamilies?: number;
+	maleCount?: number;
+	femaleCount?: number;
+	dataYear?: number;
+};
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+type ActiveTab = "overview" | "dusun" | "pekerjaan";
 
-function formatNumber(value: number) {
-	return value.toLocaleString("id-ID");
-}
+type DusunFormState = Omit<DusunItem, "id">;
 
-function toNum(value: unknown): number {
-	if (typeof value === "number" && isFinite(value))
-		return Math.max(0, Math.round(value));
-	if (typeof value === "string") {
-		const parsed = Number(value.replace(/[^\d.-]/g, ""));
-		if (isFinite(parsed)) return Math.max(0, Math.round(parsed));
-	}
-	return 0;
-}
-
-async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-	const res = await adminBeFetch(path, options);
-	if (!res.ok) throw new Error(`API error: ${res.status}`);
-	const json = (await res.json()) as BackendResponse<T>;
-	return json.data;
-}
-
-// ─── Constants ────────────────────────────────────────────────────────────────
+type OccupationFormState = Omit<OccupationItem, "id">;
 
 const CURRENT_YEAR = new Date().getFullYear();
-const EMPTY_DUSUN = {
+const DEFAULT_DUSUN_NAMES = [
+	"Dusun Ciranto",
+	"Dusun Cisagu",
+	"Dusun Mulyasari",
+	"Dusun Sidikmulya",
+	"Dusun Parinenggang",
+];
+
+const EMPTY_DUSUN: DusunFormState = {
 	dusunName: "",
 	totalKK: 0,
 	maleCount: 0,
 	femaleCount: 0,
 	dataYear: CURRENT_YEAR,
 };
-const EMPTY_AGE = { label: "", value: 0 };
-const EMPTY_OCC = { label: "", value: 0 };
+const EMPTY_OCC: OccupationFormState = { label: "", value: 0 };
 
 const INPUT_CLS =
 	"h-9 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-sky-300";
@@ -84,40 +70,112 @@ const BTN_DANGER =
 const BTN_EDIT =
 	"h-8 rounded-lg border border-slate-200 bg-white px-3 text-xs font-medium text-slate-700 hover:bg-slate-50 transition";
 
+function formatNumber(value: number) {
+	return value.toLocaleString("id-ID");
+}
+
+function toNum(value: unknown): number {
+	if (typeof value === "number" && isFinite(value)) {
+		return Math.max(0, Math.round(value));
+	}
+	if (typeof value === "string") {
+		const parsed = Number(value.replace(/[^\d.-]/g, ""));
+		if (isFinite(parsed)) return Math.max(0, Math.round(parsed));
+	}
+	return 0;
+}
+
+function slugify(value: string) {
+	return value
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+}
+
+async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+	const res = await adminBeFetch(path, options);
+	if (!res.ok) throw new Error(`API error: ${res.status}`);
+	const json = (await res.json()) as BackendResponse<T>;
+	return json.data;
+}
+
+function makeDefaultDusunRows(): DusunItem[] {
+	return DEFAULT_DUSUN_NAMES.map((dusunName, index) => ({
+		id: `dusun-default-${index + 1}`,
+		dusunName,
+		totalKK: 0,
+		maleCount: 0,
+		femaleCount: 0,
+		dataYear: CURRENT_YEAR,
+		sortOrder: index + 1,
+	}));
+}
+
+function normalizeDusunItems(items: DusunItem[]): DusunItem[] {
+	const mapped = new Map<string, DusunItem>();
+
+	for (const item of items) {
+		const normalizedName = item.dusunName.trim().toLowerCase();
+		if (!normalizedName) {
+			continue;
+		}
+
+		mapped.set(normalizedName, {
+			...item,
+			dusunName: item.dusunName.trim(),
+			dataYear: toNum(item.dataYear) || CURRENT_YEAR,
+			totalKK: toNum(item.totalKK),
+			maleCount: toNum(item.maleCount),
+			femaleCount: toNum(item.femaleCount),
+			sortOrder: item.sortOrder,
+		});
+	}
+
+	return DEFAULT_DUSUN_NAMES.map((dusunName, index) => {
+		const existing = mapped.get(dusunName.toLowerCase());
+		if (existing) {
+			return {
+				...existing,
+				id: existing.id || `dusun-${slugify(dusunName)}`,
+				sortOrder: existing.sortOrder ?? index + 1,
+			};
+		}
+
+		return {
+			id: `dusun-${slugify(dusunName)}`,
+			dusunName,
+			totalKK: 0,
+			maleCount: 0,
+			femaleCount: 0,
+			dataYear: CURRENT_YEAR,
+			sortOrder: index + 1,
+		};
+	});
+}
+
 export default function AdminStatistikPage() {
-	// ── Data state ──────────────────────────────────────────────────────────────
-	const [dusun, setDusun] = useState<DusunItem[]>([]);
-	const [ageGroups, setAgeGroups] = useState<AgeGroupItem[]>([]);
+	const [dusun, setDusun] = useState<DusunItem[]>(makeDefaultDusunRows());
 	const [occupations, setOccupations] = useState<OccupationItem[]>([]);
+	const [ringkasanApi, setRingkasanApi] = useState<RingkasanItem | null>(null);
 	const [updatedAt, setUpdatedAt] = useState(
 		new Date().toISOString().slice(0, 10),
 	);
 	const [isLoading, setIsLoading] = useState(false);
 
-	// ── UI state ─────────────────────────────────────────────────────────────────
 	const [activeTab, setActiveTab] = useState<ActiveTab>("overview");
 	const [searchTerm, setSearchTerm] = useState("");
 	const [showPadatOnly, setShowPadatOnly] = useState(false);
 
-	// ── Dusun CRUD state ─────────────────────────────────────────────────────────
-	const [dusunForm, setDusunForm] = useState(EMPTY_DUSUN);
+	const [dusunForm, setDusunForm] = useState<DusunFormState>(EMPTY_DUSUN);
 	const [editingDusunId, setEditingDusunId] = useState<string | null>(null);
 	const [showDusunForm, setShowDusunForm] = useState(false);
 	const [savingDusun, setSavingDusun] = useState(false);
 
-	// ── Age group CRUD state ──────────────────────────────────────────────────────
-	const [ageForm, setAgeForm] = useState(EMPTY_AGE);
-	const [editingAgeId, setEditingAgeId] = useState<string | null>(null);
-	const [showAgeForm, setShowAgeForm] = useState(false);
-	const [savingAge, setSavingAge] = useState(false);
-
-	// ── Occupation CRUD state ─────────────────────────────────────────────────────
-	const [occForm, setOccForm] = useState(EMPTY_OCC);
+	const [occForm, setOccForm] = useState<OccupationFormState>(EMPTY_OCC);
 	const [editingOccId, setEditingOccId] = useState<string | null>(null);
 	const [showOccForm, setShowOccForm] = useState(false);
 	const [savingOcc, setSavingOcc] = useState(false);
 
-	// ── Fetch ─────────────────────────────────────────────────────────────────────
 	useEffect(() => {
 		void fetchAll();
 	}, []);
@@ -125,29 +183,51 @@ export default function AdminStatistikPage() {
 	async function fetchAll() {
 		setIsLoading(true);
 		await Promise.allSettled([
+			fetchRingkasan(),
 			fetchDusun(),
-			fetchAgeGroups(),
 			fetchOccupations(),
 		]);
 		setIsLoading(false);
 	}
 
-	async function fetchDusun() {
+	async function fetchRingkasan() {
 		try {
-			const items = await apiFetch<DusunItem[]>("demografi/admin/dusun");
-			setDusun(Array.isArray(items) ? items : []);
-			setUpdatedAt(new Date().toISOString().slice(0, 10));
+			const item = await apiFetch<RingkasanItem>("demografi/ringkasan");
+			setRingkasanApi(item ?? null);
 		} catch {
-			showAdminToast("Gagal memuat data per dusun dari backend.", "error");
+			setRingkasanApi(null);
+			showAdminToast("Gagal memuat ringkasan statistik dari backend.", "error");
 		}
 	}
 
-	async function fetchAgeGroups() {
+	async function fetchDusun() {
 		try {
-			const items = await apiFetch<AgeGroupItem[]>("demografi/admin/usia");
-			setAgeGroups(Array.isArray(items) ? items : []);
+			const items = await apiFetch<Array<Record<string, unknown>>>(
+				"demografi/per-dusun",
+			);
+			const normalized = (Array.isArray(items) ? items : []).map(
+				(item, index) => {
+					const dusunName = String(
+						item.dusunName ?? item.name ?? item.dusun ?? `Dusun ${index + 1}`,
+					).trim();
+					return {
+						id: String(item.id ?? `dusun-${slugify(dusunName)}-${index + 1}`),
+						dusunName,
+						totalKK: toNum(item.totalKK ?? item.totalFamilies ?? item.kk),
+						maleCount: toNum(item.maleCount ?? item.maleCount ?? item.lakiLaki),
+						femaleCount: toNum(
+							item.femaleCount ?? item.femaleCount ?? item.perempuan,
+						),
+						dataYear: toNum(item.dataYear) || CURRENT_YEAR,
+						sortOrder: toNum(item.sortOrder) || index + 1,
+					} as DusunItem;
+				},
+			);
+			setDusun(normalizeDusunItems(normalized));
+			setUpdatedAt(new Date().toISOString().slice(0, 10));
 		} catch {
-			showAdminToast("Gagal memuat data kelompok usia dari backend.", "error");
+			setDusun(makeDefaultDusunRows());
+			showAdminToast("Gagal memuat data dusun dari backend.", "error");
 		}
 	}
 
@@ -165,34 +245,50 @@ export default function AdminStatistikPage() {
 		}
 	}
 
-	// ── Derived summary ───────────────────────────────────────────────────────────
 	const summary = useMemo(
 		() =>
 			dusun.reduce(
 				(acc, item) => ({
 					totalPopulation:
 						acc.totalPopulation + item.maleCount + item.femaleCount,
-					households: acc.households + item.totalKK,
+					totalFamilies: acc.totalFamilies + item.totalKK,
 					male: acc.male + item.maleCount,
 					female: acc.female + item.femaleCount,
 				}),
-				{ totalPopulation: 0, households: 0, male: 0, female: 0 },
+				{ totalPopulation: 0, totalFamilies: 0, male: 0, female: 0 },
 			),
 		[dusun],
 	);
 
-	const malePercent = summary.totalPopulation
-		? Math.round((summary.male / summary.totalPopulation) * 1000) / 10
+	const summaryView = useMemo(() => {
+		if (!ringkasanApi) {
+			return summary;
+		}
+
+		const apiSummary = {
+			totalPopulation: toNum(ringkasanApi.totalPopulation),
+			totalFamilies: toNum(ringkasanApi.totalFamilies),
+			male: toNum(ringkasanApi.maleCount),
+			female: toNum(ringkasanApi.femaleCount),
+		};
+
+		const hasApiData =
+			apiSummary.totalPopulation > 0 ||
+			apiSummary.totalFamilies > 0 ||
+			apiSummary.male > 0 ||
+			apiSummary.female > 0;
+
+		return hasApiData ? apiSummary : summary;
+	}, [ringkasanApi, summary]);
+
+	const malePercent = summaryView.totalPopulation
+		? Math.round((summaryView.male / summaryView.totalPopulation) * 1000) / 10
 		: 0;
-	const femalePercent = summary.totalPopulation
-		? Math.round((summary.female / summary.totalPopulation) * 1000) / 10
+	const femalePercent = summaryView.totalPopulation
+		? Math.round((summaryView.female / summaryView.totalPopulation) * 1000) / 10
 		: 0;
 	const maleDeg = Math.round((malePercent / 100) * 360);
 
-	const maxAgeValue = useMemo(
-		() => Math.max(1, ...ageGroups.map((item) => item.value)),
-		[ageGroups],
-	);
 	const maxDusunTotal = useMemo(
 		() =>
 			Math.max(1, ...dusun.map((item) => item.maleCount + item.femaleCount)),
@@ -217,7 +313,6 @@ export default function AdminStatistikPage() {
 		[dusun, searchTerm, showPadatOnly],
 	);
 
-	// ── Dusun CRUD ────────────────────────────────────────────────────────────────
 	function startAddDusun() {
 		setEditingDusunId(null);
 		setDusunForm(EMPTY_DUSUN);
@@ -248,6 +343,7 @@ export default function AdminStatistikPage() {
 			showAdminToast("Nama dusun wajib diisi.", "error");
 			return;
 		}
+
 		setSavingDusun(true);
 		const body = JSON.stringify({
 			dusunName: dusunForm.dusunName.trim(),
@@ -256,6 +352,7 @@ export default function AdminStatistikPage() {
 			femaleCount: toNum(dusunForm.femaleCount),
 			dataYear: toNum(dusunForm.dataYear) || CURRENT_YEAR,
 		});
+
 		try {
 			const path = editingDusunId
 				? `demografi/admin/dusun/${editingDusunId}`
@@ -300,76 +397,6 @@ export default function AdminStatistikPage() {
 		}
 	}
 
-	// ── Age Group CRUD ────────────────────────────────────────────────────────────
-	function startAddAge() {
-		setEditingAgeId(null);
-		setAgeForm(EMPTY_AGE);
-		setShowAgeForm(true);
-	}
-
-	function startEditAge(item: AgeGroupItem) {
-		setEditingAgeId(item.id);
-		setAgeForm({ label: item.label, value: item.value });
-		setShowAgeForm(true);
-	}
-
-	function cancelAgeForm() {
-		setShowAgeForm(false);
-		setEditingAgeId(null);
-		setAgeForm(EMPTY_AGE);
-	}
-
-	async function saveAge(event: React.FormEvent) {
-		event.preventDefault();
-		if (!ageForm.label.trim()) {
-			showAdminToast("Rentang usia wajib diisi.", "error");
-			return;
-		}
-		setSavingAge(true);
-		const body = JSON.stringify({
-			label: ageForm.label.trim(),
-			value: toNum(ageForm.value),
-		});
-		try {
-			const path = editingAgeId
-				? `demografi/admin/usia/${editingAgeId}`
-				: "demografi/admin/usia";
-			const res = await adminBeFetch(path, {
-				method: editingAgeId ? "PATCH" : "POST",
-				headers: { "Content-Type": "application/json" },
-				body,
-			});
-			if (!res.ok) throw new Error(`${res.status}`);
-			showAdminToast(
-				editingAgeId
-					? "Kelompok usia berhasil diperbarui."
-					: "Kelompok usia berhasil ditambahkan.",
-				"success",
-			);
-			cancelAgeForm();
-			await fetchAgeGroups();
-		} catch {
-			showAdminToast("Gagal menyimpan kelompok usia.", "error");
-		} finally {
-			setSavingAge(false);
-		}
-	}
-
-	async function deleteAge(id: string, label: string) {
-		if (!window.confirm(`Hapus kelompok usia "${label}"?`)) return;
-		try {
-			const res = await adminBeFetch(`demografi/admin/usia/${id}`, {
-				method: "DELETE",
-			});
-			if (!res.ok) throw new Error(`${res.status}`);
-			showAdminToast("Kelompok usia berhasil dihapus.", "success");
-			await fetchAgeGroups();
-		} catch {
-			showAdminToast("Gagal menghapus kelompok usia.", "error");
-		}
-	}
-
-	// ── Occupation CRUD ───────────────────────────────────────────────────────────
 	function startAddOcc() {
 		setEditingOccId(null);
 		setOccForm(EMPTY_OCC);
@@ -394,11 +421,13 @@ export default function AdminStatistikPage() {
 			showAdminToast("Nama jenis pekerjaan wajib diisi.", "error");
 			return;
 		}
+
 		setSavingOcc(true);
 		const body = JSON.stringify({
 			label: occForm.label.trim(),
 			value: toNum(occForm.value),
 		});
+
 		try {
 			const path = editingOccId
 				? `demografi/admin/pekerjaan/${editingOccId}`
@@ -438,45 +467,41 @@ export default function AdminStatistikPage() {
 		}
 	}
 
-	// ── Tab config ────────────────────────────────────────────────────────────────
 	const tabs: { id: ActiveTab; label: string }[] = [
 		{ id: "overview", label: "Ringkasan & Grafik" },
 		{ id: "dusun", label: `Per Dusun (${dusun.length})` },
-		{ id: "usia", label: `Kelompok Usia (${ageGroups.length})` },
 		{ id: "pekerjaan", label: `Jenis Pekerjaan (${occupations.length})` },
 	];
 
 	const summaryItems = [
 		{
 			label: "Total Penduduk",
-			value: formatNumber(summary.totalPopulation),
-			note: "Dihitung otomatis dari data per dusun",
+			value: formatNumber(summaryView.totalPopulation),
+			note: "Sumber: /demografi/ringkasan",
 			noteClass: "text-sky-700",
 		},
 		{
 			label: "Kepala Keluarga",
-			value: formatNumber(summary.households),
-			note: "Akumulasi semua dusun",
+			value: formatNumber(summaryView.totalFamilies),
+			note: "Sumber: /demografi/ringkasan",
 			noteClass: "text-sky-700",
 		},
 		{
 			label: "Laki-laki",
-			value: formatNumber(summary.male),
+			value: formatNumber(summaryView.male),
 			note: `${malePercent}% dari populasi`,
 			noteClass: "text-amber-700",
 		},
 		{
 			label: "Perempuan",
-			value: formatNumber(summary.female),
+			value: formatNumber(summaryView.female),
 			note: `${femalePercent}% dari populasi`,
 			noteClass: "text-sky-700",
 		},
 	];
 
-	// ── Render ────────────────────────────────────────────────────────────────────
 	return (
 		<div className="space-y-4">
-			{/* ── Header ─────────────────────────────────────────────────────────── */}
 			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
 				<div className="flex flex-wrap items-start justify-between gap-4">
 					<div className="max-w-2xl">
@@ -484,25 +509,26 @@ export default function AdminStatistikPage() {
 							Modul Statistik
 						</p>
 						<h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
-							Kelola &amp; Visualisasi Data Kependudukan
+							Kelola Statistik Desa
 						</h2>
 						<p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base">
-							Data diambil langsung dari backend. Gunakan tab di bawah untuk
-							mengelola data per dusun, kelompok usia, dan jenis pekerjaan.
+							Data diambil langsung dari backend. Fokus halaman ini hanya pada
+							data dusun dan jenis pekerjaan.
 						</p>
 					</div>
-					<button
-						type="button"
-						onClick={() => void fetchAll()}
-						disabled={isLoading}
-						className={BTN_PRIMARY}
-					>
-						{isLoading ? "Memuat..." : "Refresh Data"}
-					</button>
+					<div className="flex flex-wrap gap-2">
+						<button
+							type="button"
+							onClick={() => void fetchAll()}
+							disabled={isLoading}
+							className={BTN_PRIMARY}
+						>
+							{isLoading ? "Memuat..." : "Refresh Data"}
+						</button>
+					</div>
 				</div>
 			</section>
 
-			{/* ── Summary cards ──────────────────────────────────────────────────── */}
 			<section className="grid gap-4 md:grid-cols-2 2xl:grid-cols-4">
 				{summaryItems.map((item) => (
 					<article
@@ -522,7 +548,6 @@ export default function AdminStatistikPage() {
 				))}
 			</section>
 
-			{/* ── Tab bar ────────────────────────────────────────────────────────── */}
 			<div className="flex flex-wrap gap-2">
 				{tabs.map((tab) => (
 					<button
@@ -540,11 +565,9 @@ export default function AdminStatistikPage() {
 				))}
 			</div>
 
-			{/* ══ OVERVIEW TAB ══════════════════════════════════════════════════════ */}
 			{activeTab === "overview" && (
 				<>
 					<section className="grid gap-4 2xl:grid-cols-[0.95fr_1.7fr]">
-						{/* Gender donut */}
 						<article className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
 							<h3 className="text-2xl font-semibold text-slate-900">
 								Distribusi Gender
@@ -558,7 +581,7 @@ export default function AdminStatistikPage() {
 								<div className="flex h-full w-full items-center justify-center rounded-full bg-white text-center">
 									<div>
 										<p className="text-4xl font-semibold text-slate-900">
-											{summary.totalPopulation > 0 ? "100%" : "—"}
+											{summaryView.totalPopulation > 0 ? "100%" : "—"}
 										</p>
 										<p className="mt-1 text-sm text-slate-500">Data gender</p>
 									</div>
@@ -576,65 +599,79 @@ export default function AdminStatistikPage() {
 							</div>
 						</article>
 
-						{/* Age groups bar chart */}
 						<article className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
 							<div className="flex items-center justify-between">
 								<div>
 									<h3 className="text-2xl font-semibold text-slate-900">
-										Kelompok Usia
+										Ringkasan Dusun
 									</h3>
 									<p className="mt-1 text-sm text-slate-500">
-										Komposisi populasi per rentang umur
+										5 dusun utama yang diisi dan dikelola admin
 									</p>
 								</div>
 								<span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">
 									Update {updatedAt}
 								</span>
 							</div>
-							{ageGroups.length === 0 ? (
-								<div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-600">
-									Belum ada data kelompok usia. Tambahkan di tab{" "}
-									<button
-										type="button"
-										onClick={() => setActiveTab("usia")}
-										className="font-semibold text-sky-700 underline"
-									>
-										Kelompok Usia
-									</button>
-									.
-								</div>
-							) : (
-								<div
-									className="mt-8 items-end gap-3"
-									style={{
-										display: "grid",
-										gridTemplateColumns: `repeat(${ageGroups.length}, 1fr)`,
-										height: "250px",
-									}}
-								>
-									{ageGroups.map((item) => (
+							<div className="mt-5 space-y-4">
+								{dusun.map((item) => {
+									const total = item.maleCount + item.femaleCount;
+									const width = Math.max(
+										8,
+										Math.round((total / maxDusunTotal) * 100),
+									);
+									return (
 										<div
 											key={item.id}
-											className="flex h-full flex-col items-center justify-end gap-2"
+											className="rounded-2xl border border-slate-200 p-4"
 										>
-											<div
-												className="w-full rounded-md bg-sky-700/95"
-												style={{
-													height: `${Math.max(20, (item.value / maxAgeValue) * 200)}px`,
-												}}
-												title={`${item.label}: ${formatNumber(item.value)}`}
-											/>
-											<span className="text-[10px] text-slate-500">
-												{item.label}
-											</span>
+											<div className="flex flex-wrap items-start justify-between gap-3">
+												<div>
+													<p className="text-base font-semibold text-slate-900">
+														{item.dusunName}
+													</p>
+													<p className="mt-1 text-sm text-slate-500">
+														KK {formatNumber(item.totalKK)} · Total{" "}
+														{formatNumber(total)}
+													</p>
+												</div>
+												<p className="text-sm font-semibold text-sky-700">
+													{width}% dari dusun terbesar
+												</p>
+											</div>
+											<div className="mt-4 h-3 rounded-full bg-slate-100">
+												<div
+													className="h-3 rounded-full bg-sky-600"
+													style={{ width: `${width}%` }}
+												/>
+											</div>
+											<div className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
+												<div className="rounded-xl bg-sky-50 px-3 py-2">
+													<p className="text-xs text-slate-500">Laki-laki</p>
+													<p className="font-semibold text-slate-900">
+														{formatNumber(item.maleCount)}
+													</p>
+												</div>
+												<div className="rounded-xl bg-sky-50 px-3 py-2">
+													<p className="text-xs text-slate-500">Perempuan</p>
+													<p className="font-semibold text-slate-900">
+														{formatNumber(item.femaleCount)}
+													</p>
+												</div>
+												<div className="rounded-xl bg-sky-50 px-3 py-2">
+													<p className="text-xs text-slate-500">Total</p>
+													<p className="font-semibold text-slate-900">
+														{formatNumber(total)}
+													</p>
+												</div>
+											</div>
 										</div>
-									))}
-								</div>
-							)}
+									);
+								})}
+							</div>
 						</article>
 					</section>
 
-					{/* Occupations */}
 					<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
 						<div className="mb-5 flex items-center justify-between">
 							<div>
@@ -645,18 +682,18 @@ export default function AdminStatistikPage() {
 									Komposisi pekerjaan penduduk
 								</p>
 							</div>
+							<button
+								type="button"
+								onClick={() => setActiveTab("pekerjaan")}
+								className={BTN_SECONDARY}
+							>
+								Kelola Data Pekerjaan →
+							</button>
 						</div>
 						{occupations.length === 0 ? (
 							<div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-5 text-sm text-slate-600">
-								Belum ada data jenis pekerjaan. Tambahkan di tab{" "}
-								<button
-									type="button"
-									onClick={() => setActiveTab("pekerjaan")}
-									className="font-semibold text-sky-700 underline"
-								>
-									Jenis Pekerjaan
-								</button>
-								.
+								Belum ada data jenis pekerjaan. Tambahkan di tab Jenis
+								Pekerjaan.
 							</div>
 						) : (
 							<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
@@ -684,100 +721,9 @@ export default function AdminStatistikPage() {
 							</div>
 						)}
 					</section>
-
-					{/* Dusun table (read-only in overview) */}
-					<section className="overflow-hidden rounded-[1.6rem] border border-white/70 bg-white/85 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem]">
-						<div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-5">
-							<div>
-								<h3 className="text-2xl font-semibold text-slate-900">
-									Rincian per Dusun
-								</h3>
-								<p className="mt-1 text-sm text-slate-500">
-									Ringkasan kepadatan tiap dusun
-								</p>
-							</div>
-							<button
-								type="button"
-								onClick={() => setActiveTab("dusun")}
-								className={BTN_SECONDARY}
-							>
-								Kelola Data Dusun →
-							</button>
-						</div>
-						<div className="overflow-x-auto">
-							<table className="min-w-full border-collapse text-left text-sm">
-								<thead className="bg-slate-50 text-[11px] uppercase tracking-[0.08em] text-slate-500">
-									<tr>
-										<th className="px-4 py-3 font-semibold sm:px-5">
-											Nama Dusun
-										</th>
-										<th className="px-4 py-3 font-semibold sm:px-5">KK</th>
-										<th className="px-4 py-3 font-semibold sm:px-5">
-											Laki-laki
-										</th>
-										<th className="px-4 py-3 font-semibold sm:px-5">
-											Perempuan
-										</th>
-										<th className="px-4 py-3 font-semibold sm:px-5">Total</th>
-										<th className="px-4 py-3 font-semibold sm:px-5">
-											Kepadatan
-										</th>
-									</tr>
-								</thead>
-								<tbody>
-									{dusun.map((item) => {
-										const total = item.maleCount + item.femaleCount;
-										return (
-											<tr
-												key={item.id}
-												className="border-t border-slate-200 bg-white text-slate-700"
-											>
-												<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
-													{item.dusunName}
-												</td>
-												<td className="px-4 py-3 sm:px-5">
-													{formatNumber(item.totalKK)}
-												</td>
-												<td className="px-4 py-3 sm:px-5">
-													{formatNumber(item.maleCount)}
-												</td>
-												<td className="px-4 py-3 sm:px-5">
-													{formatNumber(item.femaleCount)}
-												</td>
-												<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
-													{formatNumber(total)}
-												</td>
-												<td className="px-4 py-3 sm:px-5">
-													<div className="h-1.5 w-20 rounded-full bg-slate-200">
-														<div
-															className="h-1.5 rounded-full bg-sky-700"
-															style={{
-																width: `${Math.round((total / maxDusunTotal) * 100)}%`,
-															}}
-														/>
-													</div>
-												</td>
-											</tr>
-										);
-									})}
-									{dusun.length === 0 && (
-										<tr>
-											<td
-												colSpan={6}
-												className="px-5 py-8 text-center text-sm text-slate-500"
-											>
-												Belum ada data dusun.
-											</td>
-										</tr>
-									)}
-								</tbody>
-							</table>
-						</div>
-					</section>
 				</>
 			)}
 
-			{/* ══ DUSUN TAB ════════════════════════════════════════════════════════ */}
 			{activeTab === "dusun" && (
 				<section className="overflow-hidden rounded-[1.6rem] border border-white/70 bg-white/85 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem]">
 					<div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-5">
@@ -800,11 +746,7 @@ export default function AdminStatistikPage() {
 							<button
 								type="button"
 								onClick={() => setShowPadatOnly((v) => !v)}
-								className={`h-9 rounded-lg px-3 text-sm font-medium transition ${
-									showPadatOnly
-										? "bg-sky-700 text-white"
-										: "bg-slate-100 text-slate-700 hover:bg-slate-200"
-								}`}
+								className={`h-9 rounded-lg px-3 text-sm font-medium transition ${showPadatOnly ? "bg-sky-700 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"}`}
 							>
 								Padat &ge;1100
 							</button>
@@ -818,7 +760,6 @@ export default function AdminStatistikPage() {
 						</div>
 					</div>
 
-					{/* Add/Edit form */}
 					{showDusunForm && (
 						<div className="border-b border-slate-200 bg-slate-50 px-5 py-5">
 							<h4 className="mb-4 text-sm font-semibold text-slate-800">
@@ -942,226 +883,86 @@ export default function AdminStatistikPage() {
 								</tr>
 							</thead>
 							<tbody>
-								{filteredDusun.map((item) => (
-									<tr
-										key={item.id}
-										className={`border-t border-slate-200 text-slate-700 ${
-											editingDusunId === item.id ? "bg-sky-50" : "bg-white"
-										}`}
-									>
-										<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
-											{item.dusunName}
-										</td>
-										<td className="px-4 py-3 sm:px-5">{item.dataYear}</td>
-										<td className="px-4 py-3 sm:px-5">
-											{formatNumber(item.totalKK)}
-										</td>
-										<td className="px-4 py-3 sm:px-5">
-											{formatNumber(item.maleCount)}
-										</td>
-										<td className="px-4 py-3 sm:px-5">
-											{formatNumber(item.femaleCount)}
-										</td>
-										<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
-											{formatNumber(item.maleCount + item.femaleCount)}
-										</td>
-										<td className="px-4 py-3 sm:px-5">
-											<div className="flex items-center gap-2">
-												<button
-													type="button"
-													onClick={() => startEditDusun(item)}
-													className={BTN_EDIT}
-												>
-													Edit
-												</button>
-												<button
-													type="button"
-													onClick={() =>
-														void deleteDusun(item.id, item.dusunName)
-													}
-													className={BTN_DANGER}
-												>
-													Hapus
-												</button>
-											</div>
-										</td>
-									</tr>
-								))}
+								{filteredDusun.map((item) => {
+									const total = item.maleCount + item.femaleCount;
+									return (
+										<tr
+											key={item.id}
+											className={`border-t border-slate-200 text-slate-700 ${editingDusunId === item.id ? "bg-sky-50" : "bg-white"}`}
+										>
+											<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
+												{item.dusunName}
+											</td>
+											<td className="px-4 py-3 sm:px-5">{item.dataYear}</td>
+											<td className="px-4 py-3 sm:px-5">
+												{formatNumber(item.totalKK)}
+											</td>
+											<td className="px-4 py-3 sm:px-5">
+												{formatNumber(item.maleCount)}
+											</td>
+											<td className="px-4 py-3 sm:px-5">
+												{formatNumber(item.femaleCount)}
+											</td>
+											<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
+												{formatNumber(total)}
+											</td>
+											<td className="px-4 py-3 sm:px-5">
+												<div className="flex items-center gap-2">
+													<button
+														type="button"
+														onClick={() => startEditDusun(item)}
+														className={BTN_EDIT}
+													>
+														Edit
+													</button>
+													<button
+														type="button"
+														onClick={() =>
+															void deleteDusun(item.id, item.dusunName)
+														}
+														className={BTN_DANGER}
+													>
+														Hapus
+													</button>
+												</div>
+											</td>
+										</tr>
+									);
+								})}
 								{filteredDusun.length === 0 && (
 									<tr>
 										<td
 											colSpan={7}
 											className="px-5 py-8 text-center text-sm text-slate-500"
 										>
-											{dusun.length === 0
-												? "Belum ada data dusun."
-												: "Tidak ada hasil pencarian."}
+											Belum ada data dusun yang cocok dengan filter.
 										</td>
 									</tr>
 								)}
 							</tbody>
 						</table>
 					</div>
-					<div className="flex items-center justify-between border-t border-slate-200 px-5 py-3 text-xs text-slate-500">
-						<p>
-							Menampilkan {filteredDusun.length} dari {dusun.length} dusun
-						</p>
-					</div>
 				</section>
 			)}
 
-			{/* ══ KELOMPOK USIA TAB ════════════════════════════════════════════════ */}
-			{activeTab === "usia" && (
-				<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
-					<div className="flex flex-wrap items-center justify-between gap-3">
-						<div>
-							<h3 className="text-2xl font-semibold text-slate-900">
-								Kelompok Usia
-							</h3>
-							<p className="mt-1 text-sm text-slate-500">
-								Komposisi populasi per rentang umur
-							</p>
-						</div>
-						<button type="button" onClick={startAddAge} className={BTN_PRIMARY}>
-							+ Tambah Kelompok Usia
-						</button>
-					</div>
-
-					{/* Add/Edit form */}
-					{showAgeForm && (
-						<div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
-							<h4 className="mb-4 text-sm font-semibold text-slate-800">
-								{editingAgeId ? "Edit Kelompok Usia" : "Tambah Kelompok Usia"}
-							</h4>
-							<form
-								onSubmit={(e) => void saveAge(e)}
-								className="flex flex-wrap items-end gap-4"
-							>
-								<div className="min-w-[180px] flex-1">
-									<label className={LABEL_CLS}>Rentang Usia *</label>
-									<input
-										className={INPUT_CLS}
-										value={ageForm.label}
-										onChange={(e) =>
-											setAgeForm((f) => ({ ...f, label: e.target.value }))
-										}
-										placeholder="cth. 25-34"
-										required
-									/>
-								</div>
-								<div className="min-w-[140px] flex-1">
-									<label className={LABEL_CLS}>Jumlah Jiwa</label>
-									<input
-										className={INPUT_CLS}
-										type="number"
-										min="0"
-										value={ageForm.value}
-										onChange={(e) =>
-											setAgeForm((f) => ({
-												...f,
-												value: Number(e.target.value),
-											}))
-										}
-									/>
-								</div>
-								<div className="flex gap-2">
-									<button
-										type="submit"
-										disabled={savingAge}
-										className={BTN_PRIMARY}
-									>
-										{savingAge
-											? "Menyimpan..."
-											: editingAgeId
-												? "Simpan"
-												: "Tambahkan"}
-									</button>
-									<button
-										type="button"
-										onClick={cancelAgeForm}
-										className={BTN_SECONDARY}
-									>
-										Batal
-									</button>
-								</div>
-							</form>
-						</div>
-					)}
-
-					{/* List */}
-					<div className="mt-5 space-y-2">
-						{ageGroups.length === 0 && !showAgeForm && (
-							<div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-								Belum ada data kelompok usia.
-							</div>
-						)}
-						{ageGroups.map((item) => (
-							<div
-								key={item.id}
-								className={`flex items-center gap-4 rounded-xl border px-4 py-3 ${
-									editingAgeId === item.id
-										? "border-sky-200 bg-sky-50"
-										: "border-slate-200 bg-white"
-								}`}
-							>
-								<div className="w-24 flex-shrink-0 text-sm font-semibold text-slate-900">
-									{item.label}
-								</div>
-								<div className="flex-1">
-									<div className="h-2 rounded-full bg-slate-100">
-										<div
-											className="h-2 rounded-full bg-sky-600"
-											style={{
-												width: `${Math.max(4, Math.round((item.value / maxAgeValue) * 100))}%`,
-											}}
-										/>
-									</div>
-								</div>
-								<div className="w-20 flex-shrink-0 text-right text-sm font-semibold text-slate-900">
-									{formatNumber(item.value)}
-								</div>
-								<div className="flex flex-shrink-0 gap-2">
-									<button
-										type="button"
-										onClick={() => startEditAge(item)}
-										className={BTN_EDIT}
-									>
-										Edit
-									</button>
-									<button
-										type="button"
-										onClick={() => void deleteAge(item.id, item.label)}
-										className={BTN_DANGER}
-									>
-										Hapus
-									</button>
-								</div>
-							</div>
-						))}
-					</div>
-				</section>
-			)}
-
-			{/* ══ JENIS PEKERJAAN TAB ══════════════════════════════════════════════ */}
 			{activeTab === "pekerjaan" && (
-				<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
-					<div className="flex flex-wrap items-center justify-between gap-3">
+				<section className="overflow-hidden rounded-[1.6rem] border border-white/70 bg-white/85 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem]">
+					<div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-5">
 						<div>
 							<h3 className="text-2xl font-semibold text-slate-900">
 								Jenis Pekerjaan
 							</h3>
 							<p className="mt-1 text-sm text-slate-500">
-								Komposisi pekerjaan penduduk desa
+								Kelola komposisi pekerjaan penduduk
 							</p>
 						</div>
 						<button type="button" onClick={startAddOcc} className={BTN_PRIMARY}>
-							+ Tambah Jenis Pekerjaan
+							+ Tambah Pekerjaan
 						</button>
 					</div>
 
-					{/* Add/Edit form */}
 					{showOccForm && (
-						<div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+						<div className="border-b border-slate-200 bg-slate-50 px-5 py-5">
 							<h4 className="mb-4 text-sm font-semibold text-slate-800">
 								{editingOccId
 									? "Edit Jenis Pekerjaan"
@@ -1169,9 +970,9 @@ export default function AdminStatistikPage() {
 							</h4>
 							<form
 								onSubmit={(e) => void saveOcc(e)}
-								className="flex flex-wrap items-end gap-4"
+								className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
 							>
-								<div className="min-w-[180px] flex-1">
+								<div className="sm:col-span-2">
 									<label className={LABEL_CLS}>Nama Pekerjaan *</label>
 									<input
 										className={INPUT_CLS}
@@ -1183,8 +984,8 @@ export default function AdminStatistikPage() {
 										required
 									/>
 								</div>
-								<div className="min-w-[140px] flex-1">
-									<label className={LABEL_CLS}>Jumlah Jiwa</label>
+								<div>
+									<label className={LABEL_CLS}>Jumlah</label>
 									<input
 										className={INPUT_CLS}
 										type="number"
@@ -1198,7 +999,7 @@ export default function AdminStatistikPage() {
 										}
 									/>
 								</div>
-								<div className="flex gap-2">
+								<div className="flex items-end gap-2 sm:col-span-2 lg:col-span-4">
 									<button
 										type="submit"
 										disabled={savingOcc}
@@ -1207,7 +1008,7 @@ export default function AdminStatistikPage() {
 										{savingOcc
 											? "Menyimpan..."
 											: editingOccId
-												? "Simpan"
+												? "Simpan Perubahan"
 												: "Tambahkan"}
 									</button>
 									<button
@@ -1222,56 +1023,61 @@ export default function AdminStatistikPage() {
 						</div>
 					)}
 
-					{/* List */}
-					<div className="mt-5 space-y-2">
-						{occupations.length === 0 && !showOccForm && (
-							<div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
-								Belum ada data jenis pekerjaan.
-							</div>
-						)}
-						{occupations.map((item) => (
-							<div
-								key={item.id}
-								className={`flex items-center gap-4 rounded-xl border px-4 py-3 ${
-									editingOccId === item.id
-										? "border-sky-200 bg-sky-50"
-										: "border-slate-200 bg-white"
-								}`}
-							>
-								<div className="w-36 flex-shrink-0 text-sm font-semibold text-slate-900">
-									{item.label}
-								</div>
-								<div className="flex-1">
-									<div className="h-2 rounded-full bg-slate-100">
-										<div
-											className="h-2 rounded-full bg-sky-600"
-											style={{
-												width: `${Math.max(4, Math.round((item.value / maxOccValue) * 100))}%`,
-											}}
-										/>
-									</div>
-								</div>
-								<div className="w-20 flex-shrink-0 text-right text-sm font-semibold text-slate-900">
-									{formatNumber(item.value)}
-								</div>
-								<div className="flex flex-shrink-0 gap-2">
-									<button
-										type="button"
-										onClick={() => startEditOcc(item)}
-										className={BTN_EDIT}
+					<div className="overflow-x-auto">
+						<table className="min-w-full border-collapse text-left text-sm">
+							<thead className="bg-slate-50 text-[11px] uppercase tracking-[0.08em] text-slate-500">
+								<tr>
+									<th className="px-4 py-3 font-semibold sm:px-5">
+										Nama Pekerjaan
+									</th>
+									<th className="px-4 py-3 font-semibold sm:px-5">Jumlah</th>
+									<th className="px-4 py-3 font-semibold sm:px-5">Aksi</th>
+								</tr>
+							</thead>
+							<tbody>
+								{occupations.map((item) => (
+									<tr
+										key={item.id}
+										className={`border-t border-slate-200 text-slate-700 ${editingOccId === item.id ? "bg-sky-50" : "bg-white"}`}
 									>
-										Edit
-									</button>
-									<button
-										type="button"
-										onClick={() => void deleteOcc(item.id, item.label)}
-										className={BTN_DANGER}
-									>
-										Hapus
-									</button>
-								</div>
-							</div>
-						))}
+										<td className="px-4 py-3 font-semibold text-slate-900 sm:px-5">
+											{item.label}
+										</td>
+										<td className="px-4 py-3 sm:px-5">
+											{formatNumber(item.value)}
+										</td>
+										<td className="px-4 py-3 sm:px-5">
+											<div className="flex items-center gap-2">
+												<button
+													type="button"
+													onClick={() => startEditOcc(item)}
+													className={BTN_EDIT}
+												>
+													Edit
+												</button>
+												<button
+													type="button"
+													onClick={() => void deleteOcc(item.id, item.label)}
+													className={BTN_DANGER}
+												>
+													Hapus
+												</button>
+											</div>
+										</td>
+									</tr>
+								))}
+								{occupations.length === 0 && (
+									<tr>
+										<td
+											colSpan={3}
+											className="px-5 py-8 text-center text-sm text-slate-500"
+										>
+											Belum ada data jenis pekerjaan.
+										</td>
+									</tr>
+								)}
+							</tbody>
+						</table>
 					</div>
 				</section>
 			)}
