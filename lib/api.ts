@@ -186,6 +186,14 @@ export async function getDemografiPerDusun(dataYear?: number) {
 	return fetchApiData<BackendDemografiPerDusunItem[]>(`/demografi/per-dusun${query}`);
 }
 
+export async function getDemografiUsia() {
+	return fetchApiData<BackendDemografiAgeGroup[]>("/demografi/usia");
+}
+
+export async function getDemografiPekerjaan() {
+	return fetchApiData<BackendDemografiOccupation[]>("/demografi/pekerjaan");
+}
+
 export type BackendDemografiDusunAdmin = {
 	id: string;
 	name: string;

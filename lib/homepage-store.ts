@@ -49,7 +49,7 @@ export const initialHomepageContent: HomepageContent = {
   jelajahiLabel: 'Jelajahi Desa',
   jelajahiHref: '/potensi',
   logoKabupatenLabel: 'Kabupaten Pangandaran',
-  logoKabupatenImageUrl: '',
+  logoKabupatenImageUrl: '/images/logo-pangandaran.svg',
   heroSlides: [
     { id: 'slide-1', imageUrl: '/images/karsidi-kades.jpeg', caption: 'Perangkat Desa Jadimulya' },
     { id: 'slide-2', imageUrl: '/images/hero-bg.jpg', caption: 'Kantor Desa Jadimulya' },
