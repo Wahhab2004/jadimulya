@@ -37,7 +37,7 @@ export default function HomepageOverview({ features, news }: HomepageOverviewPro
         </div>
       </div>
       <div className="mt-12">
-        <SectionHeader title="Warta Desa Terkini" subtitle="Informasi terbaru dari Desa Jadimulya untuk masyarakat dan pemangku kepentingan." />
+        <SectionHeader title="Berita Desa Terkini" subtitle="Informasi terbaru dari Desa Jadimulya untuk masyarakat dan pemangku kepentingan." />
         <div className="grid gap-6 md:grid-cols-3">
           {news.map((article) => (
             <NewsCard

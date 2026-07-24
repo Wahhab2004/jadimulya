@@ -7,16 +7,33 @@ import {
 	subscribeMediaLibraryUpdates,
 	type MediaItem,
 } from "@/lib/media-store";
+import { adminBeFetch } from "@/lib/admin-api-client";
 
-export type AdminPotensiCategory = "PERTANIAN" | "PARIWISATA";
+// BARU — kategori potensi sekarang data dinamis (tabel PotentialCategory di
+// backend), bukan enum tetap PERTANIAN/PARIWISATA lagi. Form ini sekarang
+// menyimpan `categoryId` (uuid) dan mengambil daftar kategori dari endpoint
+// admin: GET /potensi/admin/kategori.
+
+export type AdminPotensiCategoryOption = {
+	id: string;
+	name: string;
+	isPublic: boolean;
+	sortOrder: number;
+};
 
 export type AdminPotensiFormState = {
 	name: string;
 	shortDesc: string;
 	fullDesc: string;
-	category: AdminPotensiCategory;
+	categoryId: string;
 	coverImage: string;
 	isHighlight: boolean;
+};
+
+type BackendResponse<T> = {
+	success: boolean;
+	message: string;
+	data: T;
 };
 
 type AdminPotensiFormProps = {
@@ -39,6 +56,11 @@ export default function AdminPotensiForm({
 	cancelHref,
 }: AdminPotensiFormProps) {
 	const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+	const [categories, setCategories] = useState<AdminPotensiCategoryOption[]>(
+		[],
+	);
+	const [isLoadingCategories, setIsLoadingCategories] = useState(false);
+	const [categoryError, setCategoryError] = useState("");
 
 	useEffect(() => {
 		let isMounted = true;
@@ -66,6 +88,49 @@ export default function AdminPotensiForm({
 		};
 	}, []);
 
+	useEffect(() => {
+		let isMounted = true;
+
+		const loadCategories = async () => {
+			setIsLoadingCategories(true);
+			setCategoryError("");
+
+			try {
+				// Admin butuh semua kategori (termasuk yang isPublic: false),
+				// jadi pakai endpoint admin, bukan endpoint publik /potensi/kategori.
+				const response = await adminBeFetch("potensi/admin/kategori", {
+					method: "GET",
+				});
+
+				if (!response.ok) {
+					throw new Error("Gagal mengambil kategori potensi");
+				}
+
+				const payload = (await response.json()) as BackendResponse<
+					AdminPotensiCategoryOption[]
+				>;
+
+				if (isMounted) {
+					setCategories(Array.isArray(payload.data) ? payload.data : []);
+				}
+			} catch {
+				if (isMounted) {
+					setCategoryError("Tidak bisa memuat daftar kategori dari backend.");
+				}
+			} finally {
+				if (isMounted) {
+					setIsLoadingCategories(false);
+				}
+			}
+		};
+
+		void loadCategories();
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
+
 	return (
 		<form
 			onSubmit={onSubmit}
@@ -88,6 +153,7 @@ export default function AdminPotensiForm({
 					}
 					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 					required
+					minLength={3}
 				/>
 			</label>
 
@@ -96,18 +162,38 @@ export default function AdminPotensiForm({
 					Kategori
 				</span>
 				<select
-					value={formState.category}
+					value={formState.categoryId}
 					onChange={(event) =>
 						onChange({
 							...formState,
-							category: event.target.value as AdminPotensiCategory,
+							categoryId: event.target.value,
 						})
 					}
 					className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-900 outline-none transition focus:border-sky-300"
+					required
+					disabled={isLoadingCategories || categories.length === 0}
 				>
-					<option value="PERTANIAN">Pertanian</option>
-					<option value="PARIWISATA">Pariwisata</option>
+					<option value="" disabled>
+						{isLoadingCategories ? "Memuat kategori..." : "Pilih kategori"}
+					</option>
+					{categories.map((category) => (
+						<option key={category.id} value={category.id}>
+							{category.name}
+							{category.isPublic ? "" : " (tersembunyi)"}
+						</option>
+					))}
 				</select>
+				{categoryError ? (
+					<span className="mt-1 block text-xs text-rose-600">
+						{categoryError}
+					</span>
+				) : null}
+				{!isLoadingCategories && !categoryError && categories.length === 0 ? (
+					<span className="mt-1 block text-xs text-amber-600">
+						Belum ada kategori. Tambahkan kategori potensi dulu sebelum membuat
+						data potensi.
+					</span>
+				) : null}
 			</label>
 
 			<label className="block">
@@ -121,6 +207,7 @@ export default function AdminPotensiForm({
 					}
 					className="min-h-24 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-300"
 					required
+					minLength={10}
 				/>
 			</label>
 
@@ -187,7 +274,8 @@ export default function AdminPotensiForm({
 			<div className="flex flex-wrap gap-2">
 				<button
 					type="submit"
-					className="rounded-full bg-sky-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-800"
+					className="rounded-full bg-sky-700 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+					disabled={!formState.categoryId}
 				>
 					{submitLabel}
 				</button>

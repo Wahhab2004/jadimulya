@@ -4,30 +4,27 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import Footer from "@/app/components/Footer";
 import Header from "@/app/components/Header";
+import PotensiDetailModal from "@/app/components/PotensiDetailModal";
 import {
+	getCategoryBadgeStyle,
 	initialPotensiItems,
 	loadStoredPotensiItems,
-	type PotensiCategory,
 	type PotensiItem,
 } from "@/lib/potensi-store";
-import { getPotensi } from "@/lib/api";
+import {
+	getPotensi,
+	getPotensiKategori,
+	type BackendPotensiCategory,
+} from "@/lib/api";
+import { downloadPotensiCatalogPdf } from "@/lib/potensi-catalog-pdf";
 
-const categoryFilters = ["Semua Potensi", "Pertanian", "Wisata"] as const;
-type CategoryFilter = (typeof categoryFilters)[number];
+const SEMUA_POTENSI = "Semua Potensi";
 
-// Kategori warna konsisten mengikuti nuansa sky/blue Pangandaran
-const categoryBadgeStyles: Record<PotensiCategory, string> = {
-	Pertanian: "bg-sky-100 text-sky-800 border-sky-200",
-	Wisata: "bg-blue-100 text-blue-800 border-blue-200",
-};
-
-const categoryOrderWeight: Record<PotensiCategory, number> = {
-	Pertanian: 1,
-	Wisata: 2,
-};
-
-const cardActionIcons: Record<PotensiCategory, JSX.Element> = {
-	Pertanian: (
+// Ikon generik untuk aksi tambahan di kartu — kategori sekarang dinamis
+// (nama bebas dari admin), jadi tidak lagi ada ikon khusus per kategori
+// seperti sebelumnya (yang cuma cocok untuk 2 kategori tetap).
+function CardActionIcon() {
+	return (
 		<svg
 			viewBox="0 0 24 24"
 			className="h-4 w-4"
@@ -36,34 +33,22 @@ const cardActionIcons: Record<PotensiCategory, JSX.Element> = {
 			strokeWidth="2"
 			aria-hidden="true"
 		>
-			<path d="M7 13c0 3 2 5 5 5" />
-			<path d="M17 11c0 4-2 8-5 8V6c2 0 5 2 5 5Z" />
-			<path d="M12 10c-2 0-5 2-5 5" />
+			<path d="M9 18h6" />
+			<path d="M10 21h4" />
+			<path d="M12 3a6 6 0 0 0-6 6c0 2.5 1.5 4 2.5 5.5S10 17 10 18h4c0-1 1-1.5 2-3s2.5-3 2.5-5.5A6 6 0 0 0 12 3Z" />
 		</svg>
-	),
-	Wisata: (
-		<svg
-			viewBox="0 0 24 24"
-			className="h-4 w-4"
-			fill="none"
-			stroke="currentColor"
-			strokeWidth="2"
-			aria-hidden="true"
-		>
-			<path d="M7 21h10" />
-			<path d="M12 21V10" />
-			<path d="M5 5h7l2 3H5V5Z" />
-			<path d="m14 8 2 3h3" />
-		</svg>
-	),
-};
+	);
+}
 
 export default function PotensiPage() {
 	const [potensiItems, setPotensiItems] =
 		useState<PotensiItem[]>(initialPotensiItems);
-	const [activeFilter, setActiveFilter] =
-		useState<CategoryFilter>("Semua Potensi");
+	const [categories, setCategories] = useState<BackendPotensiCategory[]>([]);
+	const [activeFilter, setActiveFilter] = useState<string>(SEMUA_POTENSI);
 	const [visibleCount, setVisibleCount] = useState(6);
+	const [selectedItem, setSelectedItem] = useState<PotensiItem | null>(null);
+	const [isDownloading, setIsDownloading] = useState(false);
+	const [downloadError, setDownloadError] = useState("");
 
 	useEffect(() => {
 		const localItems = loadStoredPotensiItems();
@@ -72,23 +57,24 @@ export default function PotensiPage() {
 		void (async () => {
 			try {
 				const apiItems = await getPotensi();
-				const mappedItems = apiItems
-					.filter(
-						(item) =>
-							item.category === "PERTANIAN" || item.category === "PARIWISATA",
-					)
-					.map(
-						(item) =>
-							({
-								id: item.id,
-								title: item.name,
-								description: item.shortDesc,
-								category:
-									item.category === "PARIWISATA" ? "Wisata" : "Pertanian",
-								tag: item.isHighlight ? "Highlight" : "Reguler",
-								imageUrl: item.coverImage ?? "/images/potensi-wisata.jpg",
-							}) satisfies PotensiItem,
-					);
+				const mappedItems = apiItems.map(
+					(item) =>
+						({
+							id: item.id,
+							title: item.name,
+							description: item.shortDesc,
+							fullDesc: item.fullDesc ?? undefined,
+							category: item.category?.name ?? "Lainnya",
+							tag: item.isHighlight ? "Highlight" : "Reguler",
+							imageUrl: item.coverImage ?? "/images/potensi-wisata.jpg",
+							images:
+								item.images && item.images.length > 0
+									? [...item.images]
+											.sort((a, b) => a.sortOrder - b.sortOrder)
+											.map((image) => image.imageUrl)
+									: undefined,
+						}) satisfies PotensiItem,
+				);
 
 				if (mappedItems.length > 0) {
 					setPotensiItems(mappedItems);
@@ -97,26 +83,78 @@ export default function PotensiPage() {
 				// Menyimpan data lokal secara tenang jika koneksi sedang disesuaikan
 			}
 		})();
+
+		void (async () => {
+			try {
+				const apiCategories = await getPotensiKategori();
+				setCategories(
+					[...apiCategories].sort((a, b) => a.sortOrder - b.sortOrder),
+				);
+			} catch {
+				// Filter tetap jalan dengan "Semua Potensi" saja kalau kategori gagal dimuat
+			}
+		})();
 	}, []);
+
+	// Bobot urutan kategori sekarang diambil dari sortOrder backend, bukan
+	// hardcode Pertanian:1, Wisata:2 — supaya ikut urutan yang diatur admin.
+	const categoryOrderWeight = useMemo(() => {
+		const weights = new Map<string, number>();
+		categories.forEach((category, index) => {
+			weights.set(category.name, category.sortOrder ?? index);
+		});
+		return weights;
+	}, [categories]);
+
+	const categoryFilters = useMemo(
+		() => [SEMUA_POTENSI, ...categories.map((category) => category.name)],
+		[categories],
+	);
 
 	const filteredItems = useMemo(() => {
 		const base =
-			activeFilter === "Semua Potensi"
+			activeFilter === SEMUA_POTENSI
 				? potensiItems
 				: potensiItems.filter((item) => item.category === activeFilter);
 
 		return [...base].sort((a, b) => {
-			if (categoryOrderWeight[a.category] !== categoryOrderWeight[b.category]) {
-				return (
-					categoryOrderWeight[a.category] - categoryOrderWeight[b.category]
-				);
+			const weightA = categoryOrderWeight.get(a.category) ?? 999;
+			const weightB = categoryOrderWeight.get(b.category) ?? 999;
+			if (weightA !== weightB) {
+				return weightA - weightB;
 			}
 			return a.title.localeCompare(b.title);
 		});
-	}, [activeFilter, potensiItems]);
+	}, [activeFilter, potensiItems, categoryOrderWeight]);
 
 	const visibleItems = filteredItems.slice(0, visibleCount);
 	const hasMore = visibleCount < filteredItems.length;
+
+	// Daftar lengkap (tidak difilter) tapi tetap terurut sesuai kategori —
+	// dipakai untuk PDF supaya katalog yang diunduh selalu berisi semua
+	// potensi, terlepas dari filter yang sedang aktif di layar.
+	const sortedAllItems = useMemo(() => {
+		return [...potensiItems].sort((a, b) => {
+			const weightA = categoryOrderWeight.get(a.category) ?? 999;
+			const weightB = categoryOrderWeight.get(b.category) ?? 999;
+			if (weightA !== weightB) {
+				return weightA - weightB;
+			}
+			return a.title.localeCompare(b.title);
+		});
+	}, [potensiItems, categoryOrderWeight]);
+
+	async function handleDownloadCatalog() {
+		setDownloadError("");
+		setIsDownloading(true);
+		try {
+			await downloadPotensiCatalogPdf(sortedAllItems);
+		} catch {
+			setDownloadError("Gagal membuat PDF. Coba lagi beberapa saat.");
+		} finally {
+			setIsDownloading(false);
+		}
+	}
 
 	// Item Unggulan untuk Hero Spotlight Banner
 	const highlightItem = useMemo(
@@ -139,8 +177,8 @@ export default function PotensiPage() {
 						</h1>
 
 						<p className="mt-4 max-w-2xl mx-auto text-sm sm:text-base text-slate-600 leading-relaxed">
-							Menemukan kekuatan desa dari sektor pertanian dan pariwisata yang
-							menjadi pilar prioritas pengembangan dan kesejahteraan warga desa.
+							Menemukan kekuatan desa dari berbagai sektor unggulan yang menjadi
+							pilar prioritas pengembangan dan kesejahteraan warga desa.
 						</p>
 					</div>
 
@@ -166,7 +204,7 @@ export default function PotensiPage() {
 									<div className="p-6 sm:p-8 lg:col-span-5 flex flex-col justify-center">
 										<div className="flex items-center gap-2">
 											<span
-												className={`inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider border ${categoryBadgeStyles[highlightItem.category]}`}
+												className={`inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider border ${getCategoryBadgeStyle(highlightItem.category)}`}
 											>
 												{highlightItem.category}
 											</span>
@@ -180,6 +218,7 @@ export default function PotensiPage() {
 										<div className="mt-6 flex items-center gap-3">
 											<button
 												type="button"
+												onClick={() => setSelectedItem(highlightItem)}
 												className="rounded-full bg-sky-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
 											>
 												Lihat Selengkapnya
@@ -243,7 +282,7 @@ export default function PotensiPage() {
 										sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
 									/>
 									<span
-										className={`absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider border backdrop-blur-md shadow-sm ${categoryBadgeStyles[item.category]}`}
+										className={`absolute top-4 left-4 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider border backdrop-blur-md shadow-sm ${getCategoryBadgeStyle(item.category)}`}
 									>
 										{item.category}
 									</span>
@@ -267,6 +306,7 @@ export default function PotensiPage() {
 									<div className="mt-6 flex items-center gap-2 pt-4 border-t border-slate-100">
 										<button
 											type="button"
+											onClick={() => setSelectedItem(item)}
 											className="inline-flex flex-1 items-center justify-center rounded-full bg-sky-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white transition hover:bg-blue-700"
 										>
 											Lihat Detail
@@ -276,7 +316,7 @@ export default function PotensiPage() {
 											className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 text-sky-700 transition hover:bg-sky-50"
 											aria-label={`Aksi Tambahan ${item.title}`}
 										>
-											{cardActionIcons[item.category]}
+											<CardActionIcon />
 										</button>
 									</div>
 								</div>
@@ -332,16 +372,30 @@ export default function PotensiPage() {
 							</button>
 							<button
 								type="button"
-								className="rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+								onClick={handleDownloadCatalog}
+								disabled={isDownloading || sortedAllItems.length === 0}
+								className="rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
 							>
-								Unduh Katalog Potensi (PDF)
+								{isDownloading
+									? "Menyiapkan PDF..."
+									: "Unduh Katalog Potensi (PDF)"}
 							</button>
 						</div>
+						{downloadError ? (
+							<p className="mt-3 text-xs font-medium text-rose-600">
+								{downloadError}
+							</p>
+						) : null}
 					</div>
 				</section>
 			</main>
 
 			<Footer />
+
+			<PotensiDetailModal
+				item={selectedItem}
+				onClose={() => setSelectedItem(null)}
+			/>
 		</div>
 	);
 }

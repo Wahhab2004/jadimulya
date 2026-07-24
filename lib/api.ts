@@ -24,16 +24,32 @@ export type BackendOrganisasiItem = {
 	updatedAt: string;
 };
 
-export type PotensiCategory = "PERTANIAN" | "PARIWISATA" | "UMKM";
+// BARU — kategori potensi sekarang data dinamis (tabel PotentialCategory di
+// backend), bukan enum tetap PERTANIAN/PARIWISATA/UMKM lagi. GET /potensi
+// meng-include object kategori penuh lewat relasi Prisma di sisi backend.
+export type BackendPotensiCategory = {
+	id: string;
+	name: string;
+	isPublic: boolean;
+	sortOrder: number;
+};
+
+export type BackendPotensiImage = {
+	id: string;
+	imageUrl: string;
+	sortOrder: number;
+};
 
 export type BackendPotensiItem = {
 	id: string;
 	name: string;
-	category: PotensiCategory;
+	category: BackendPotensiCategory;
 	shortDesc: string;
+	fullDesc: string | null;
 	coverImage: string | null;
 	isHighlight: boolean;
 	isActive?: boolean;
+	images: BackendPotensiImage[];
 	createdAt?: string;
 	updatedAt?: string;
 };
@@ -132,7 +148,10 @@ async function fetchJson<T>(path: string, options?: RequestInit): Promise<T> {
 	return res.json();
 }
 
-async function fetchApiData<T>(path: string, options?: RequestInit): Promise<T> {
+async function fetchApiData<T>(
+	path: string,
+	options?: RequestInit,
+): Promise<T> {
 	const payload = await fetchJson<ApiResponse<T>>(path, options);
 	return payload.data;
 }
@@ -162,12 +181,12 @@ export async function getSejarahMilestone(params?: { year?: string | number }) {
 }
 
 export async function getPotensi(params?: {
-	category?: PotensiCategory;
+	categoryId?: string;
 	highlightOnly?: boolean;
 }) {
 	const query = new URLSearchParams();
-	if (params?.category) {
-		query.set("category", params.category);
+	if (params?.categoryId) {
+		query.set("categoryId", params.categoryId);
 	}
 	if (typeof params?.highlightOnly === "boolean") {
 		query.set("highlightOnly", String(params.highlightOnly));
@@ -177,13 +196,21 @@ export async function getPotensi(params?: {
 	return fetchApiData<BackendPotensiItem[]>(`/potensi${suffix}`);
 }
 
+// BARU — daftar kategori publik (hanya yang isPublic: true), dipakai untuk
+// membangun filter kategori secara dinamis di halaman katalog potensi.
+export async function getPotensiKategori() {
+	return fetchApiData<BackendPotensiCategory[]>("/potensi/kategori");
+}
+
 export async function getDemografiRingkasan() {
 	return fetchApiData<BackendDemografiRingkasan>("/demografi/ringkasan");
 }
 
 export async function getDemografiPerDusun(dataYear?: number) {
 	const query = typeof dataYear === "number" ? `?dataYear=${dataYear}` : "";
-	return fetchApiData<BackendDemografiPerDusunItem[]>(`/demografi/per-dusun${query}`);
+	return fetchApiData<BackendDemografiPerDusunItem[]>(
+		`/demografi/per-dusun${query}`,
+	);
 }
 
 export async function getDemografiUsia() {

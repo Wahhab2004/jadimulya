@@ -44,15 +44,7 @@ export const adminNavItems: AdminNavItem[] = [
 		phase: "MVP",
 		enabled: true,
 	},
-	{
-		label: "Sejarah Desa",
-		href: "/admin/sejarah",
-		description: "Kelola narasi sejarah dan milestone secara mandiri.",
-		shortLabel: "Sejarah",
-		icon: "sejarah",
-		phase: "MVP",
-		enabled: true,
-	},
+
 	{
 		label: "Statistik",
 		href: "/admin/statistik",
@@ -89,6 +81,15 @@ export const adminNavItems: AdminNavItem[] = [
 		description: "Kelola ringkasan demografi warga desa.",
 		shortLabel: "Demografi",
 		icon: "demografi",
+		phase: "Next",
+		enabled: false,
+	},
+	{
+		label: "Sejarah Desa",
+		href: "/admin/sejarah",
+		description: "Kelola narasi sejarah dan milestone secara mandiri.",
+		shortLabel: "Sejarah",
+		icon: "sejarah",
 		phase: "Next",
 		enabled: false,
 	},
