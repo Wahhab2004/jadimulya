@@ -13,6 +13,7 @@ import {
 } from "@/lib/organisasi-store";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
+import Image from "next/image";
 
 type OrganisasiFormState = Omit<OrganisasiMember, "id">;
 
@@ -484,7 +485,7 @@ export default function AdminOrganisasiPage() {
 							<div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-200/60 shadow-inner">
 								{form.photoUrl ? (
 									// eslint-disable-next-next/no-img-element
-									<img
+									<Image
 										src={form.photoUrl}
 										alt="Preview"
 										className="h-full w-full object-cover"
@@ -492,6 +493,8 @@ export default function AdminOrganisasiPage() {
 											(e.target as HTMLImageElement).src =
 												"https://placehold.co/150x150?text=Error";
 										}}
+										width={150}
+										height={150}
 									/>
 								) : (
 									<div className="flex h-full w-full items-center justify-center text-slate-400">
@@ -850,7 +853,7 @@ export default function AdminOrganisasiPage() {
 										<div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-slate-200 bg-slate-100">
 											{member.photoUrl ? (
 												// eslint-disable-next-next/no-img-element
-												<img
+												<Image
 													src={member.photoUrl}
 													alt={member.name}
 													className="h-full w-full object-cover"
@@ -858,6 +861,8 @@ export default function AdminOrganisasiPage() {
 														(e.target as HTMLImageElement).src =
 															"https://placehold.co/100x100?text=Aparatur";
 													}}
+													width={150}
+													height={150}
 												/>
 											) : (
 												<div className="flex h-full w-full items-center justify-center font-bold text-slate-400">

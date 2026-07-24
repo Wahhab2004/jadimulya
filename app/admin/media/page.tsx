@@ -334,7 +334,7 @@ export default function AdminMediaPage() {
 						{isLoading ? (
 							<p>Memuat media library...</p>
 						) : filter ? (
-							<p>Tidak ditemukan media dengan kata kunci "{filter}".</p>
+							<p>Tidak ditemukan media dengan kata kunci &quot;{filter}&quot;.</p>
 						) : (
 							<p>
 								Belum ada media tersimpan. Silakan unggah berkas gambar pertama

@@ -26,6 +26,7 @@ import {
 	subscribeMediaLibraryUpdates,
 	type MediaItem,
 } from "@/lib/media-store";
+import Image from "next/image";
 
 // --- Types ---
 type NewsCategory =
@@ -457,7 +458,7 @@ export default function AdminNewsPage() {
 									<p className="px-2 py-1 text-[11px] font-medium text-slate-500">
 										Preview Cover:
 									</p>
-									<img
+									<Image
 										src={form.coverImage}
 										alt="Preview"
 										className="h-36 w-full rounded-lg object-cover"
@@ -609,13 +610,15 @@ export default function AdminNewsPage() {
 									<div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 										<div className="flex items-start gap-3">
 											{item.coverImage ? (
-												<img
+												<Image
 													src={item.coverImage}
 													alt={item.title}
 													className="h-16 w-16 flex-shrink-0 rounded-xl object-cover"
 													onError={(e) => {
 														(e.target as HTMLElement).style.display = "none";
 													}}
+													width={64}
+													height={64}
 												/>
 											) : (
 												<div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-slate-200 text-slate-400">
