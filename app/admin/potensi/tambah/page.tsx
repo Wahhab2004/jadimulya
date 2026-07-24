@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import AdminPotensiForm, {
 	type AdminPotensiFormState,
 } from "@/app/components/AdminPotensiForm";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
 
-// BARU — category enum tetap diganti categoryId (uuid), sesuai
-// potensi.schema.ts di backend (createPotensiSchema.body.categoryId).
 const emptyForm: AdminPotensiFormState = {
 	name: "",
 	shortDesc: "",
@@ -29,7 +28,6 @@ function normalizeUrl(value: string) {
 		if (typeof window !== "undefined") {
 			return new URL(trimmed, window.location.origin).toString();
 		}
-
 		return undefined;
 	}
 
@@ -47,6 +45,12 @@ export default function AdminPotensiTambahPage() {
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault();
+
+		// Validasi Sederhana Klien
+		if (!formState.name.trim()) {
+			showAdminToast("Nama potensi wajib diisi.", "error");
+			return;
+		}
 
 		if (!formState.categoryId) {
 			showAdminToast("Pilih kategori potensi terlebih dahulu.", "error");
@@ -72,42 +76,89 @@ export default function AdminPotensiTambahPage() {
 			});
 
 			if (!response.ok) {
-				throw new Error("Gagal menambah potensi");
+				const errorPayload = (await response.json().catch(() => null)) as {
+					message?: string;
+				} | null;
+				throw new Error(
+					errorPayload?.message || "Gagal menambah data potensi.",
+				);
 			}
 
 			showAdminToast("Potensi baru berhasil ditambahkan.", "success");
 			router.push("/admin/potensi");
-		} catch {
-			showAdminToast("Gagal menambah potensi. Periksa format input.", "error");
+		} catch (err) {
+			const errorMsg =
+				err instanceof Error
+					? err.message
+					: "Gagal menambah potensi. Periksa format input.";
+			showAdminToast(errorMsg, "error");
 		} finally {
 			setIsSaving(false);
 		}
 	}
 
 	return (
-		<div className="space-y-4">
-			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-6">
-				<p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
-					Potensi Desa
-				</p>
-				<h2 className="mt-2 text-2xl font-semibold text-slate-900">
-					Tambah Potensi Baru
-				</h2>
-				<p className="mt-2 text-sm leading-6 text-slate-600">
-					Isi satu data potensi dalam halaman khusus agar lebih fokus dan minim
-					salah input.
-				</p>
+		<div className="space-y-6">
+			{/* Top Header Card */}
+			<section className="relative overflow-hidden rounded-[1.6rem] border border-white/80 bg-gradient-to-r from-white/90 via-sky-50/50 to-white/90 p-5 shadow-[0_20px_40px_-15px_rgba(15,23,42,0.07)] backdrop-blur-md lg:rounded-[2rem] lg:p-7">
+				{/* Breadcrumb Nav */}
+				<nav className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-500">
+					<Link href="/admin/potensi" className="transition hover:text-sky-700">
+						Modul Potensi
+					</Link>
+					<span>/</span>
+					<span className="text-slate-800 font-semibold">Tambah Data</span>
+				</nav>
+
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div>
+						<div className="inline-flex items-center gap-2 rounded-full bg-sky-100/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-sky-800">
+							<span className="h-2 w-2 rounded-full bg-sky-500" />
+							Formulir Data Baru
+						</div>
+						<h2 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+							Tambah Potensi Desa
+						</h2>
+						<p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600 sm:text-base">
+							Isi informasi potensi desa secara lengkap dan fokus agar tampilan
+							di halaman utama publik terlihat menarik.
+						</p>
+					</div>
+
+					<Link
+						href="/admin/potensi"
+						className="inline-flex items-center gap-2 rounded-xl border border-slate-200/90 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:shadow"
+					>
+						<svg
+							className="h-4 w-4 text-slate-500"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={2}
+								d="M10 19l-7-7m0 0l7-7m-7 7h18"
+							/>
+						</svg>
+						<span>Kembali ke Daftar</span>
+					</Link>
+				</div>
 			</section>
 
-			<AdminPotensiForm
-				title="Form Tambah Potensi"
-				description="Lengkapi data agar kartu potensi tampil rapi di halaman publik."
-				formState={formState}
-				onChange={setFormState}
-				onSubmit={handleSubmit}
-				submitLabel={isSaving ? "Menyimpan..." : "Simpan Potensi"}
-				cancelHref="/admin/potensi"
-			/>
+			{/* Main Form Section */}
+			<section className="relative">
+				<AdminPotensiForm
+					title="Formulir Detail Potensi"
+					description="Lengkapi input di bawah ini. Tanda bintang (*) menunjukkan kolom yang wajib diisi."
+					formState={formState}
+					onChange={setFormState}
+					onSubmit={handleSubmit}
+					submitLabel={isSaving ? "Menyimpan..." : "Simpan Potensi"}
+					cancelHref="/admin/potensi"
+				/>
+			</section>
 		</div>
 	);
 }

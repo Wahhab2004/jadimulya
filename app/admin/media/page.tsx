@@ -1,7 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+	FileImageIcon,
+	UploadCloud,
+	Search,
+	RefreshCw,
+	Trash2,
+	Copy,
+	Check,
+	FileImage,
+	AlertCircle,
+	Info,
+	Sparkles,
+} from "lucide-react";
 import {
 	MEDIA_MAX_FILE_SIZE,
 	isAllowedImageSize,
@@ -12,10 +25,6 @@ import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch, buildAdminBeUrl } from "@/lib/admin-api-client";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
-// Bentuk data ini sengaja mengikuti persis model `Media` di Prisma
-// (fileName/sizeBytes, bukan name/size) supaya tidak ada lapisan mapping
-// tambahan antara response backend dan state di sini.
-
 type MediaItem = {
 	id: string;
 	fileName: string;
@@ -31,10 +40,7 @@ type BackendResponse<T> = {
 	data: T;
 };
 
-// Kalau file yang diunggah disajikan dari origin backend yang berbeda dari
-// frontend (bukan lewat rewrite/proxy Next.js untuk path /uploads), set
-// NEXT_PUBLIC_BACKEND_URL ke origin backend (mis. https://api.jadimulya.id).
-// Kalau kosong, url dari backend dipakai apa adanya seperti sebelumnya.
+// ─── Constants & Helpers ────────────────────────────────────────────────────
 const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
 const API_BASE_ORIGIN = (() => {
 	try {
@@ -47,7 +53,6 @@ const API_BASE_ORIGIN = (() => {
 function resolveMediaUrl(url: string) {
 	if (/^https?:\/\//i.test(url)) return url;
 	if (url.startsWith("/")) {
-		// Keep root-relative upload paths on FE origin; Next rewrite forwards to BE.
 		return url;
 	}
 	const origin = BACKEND_ORIGIN || API_BASE_ORIGIN;
@@ -82,12 +87,14 @@ async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
 	return (json as BackendResponse<T>).data;
 }
 
+// ─── Main Component ─────────────────────────────────────────────────────────
 export default function AdminMediaPage() {
 	const [items, setItems] = useState<MediaItem[]>([]);
 	const [notice, setNotice] = useState("");
 	const [filter, setFilter] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
+	const [copiedId, setCopiedId] = useState<string | null>(null);
 
 	useEffect(() => {
 		void fetchMedia();
@@ -156,13 +163,14 @@ export default function AdminMediaPage() {
 		setIsUploading(true);
 		let successCount = 0;
 
-		// Backend hanya menerima satu file per request (`upload.single('file')`),
-		// jadi tiap file dikirim sebagai request terpisah.
 		for (const file of validFiles) {
 			try {
 				const formData = new FormData();
 				formData.append("file", file);
-				await apiFetch<MediaItem>("media", { method: "POST", body: formData });
+				await apiFetch<MediaItem>("media", {
+					method: "POST",
+					body: formData,
+				});
 				successCount += 1;
 			} catch {
 				rejectedCount += 1;
@@ -205,114 +213,200 @@ export default function AdminMediaPage() {
 		}
 	}
 
+	function handleCopyUrl(id: string, url: string) {
+		const fullUrl = resolveMediaUrl(url);
+		void navigator.clipboard.writeText(fullUrl);
+		setCopiedId(id);
+		showAdminToast("URL media berhasil disalin ke clipboard!", "success");
+		setTimeout(() => setCopiedId(null), 2000);
+	}
+
 	return (
-		<div className="space-y-4">
-			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-7">
-				<p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-					Modul Media
-				</p>
+		<div className="space-y-6 font-sans text-slate-800">
+			{/* Header Banner */}
+			<section className="rounded-[1.8rem] border border-white/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-7">
+				<div className="flex items-center gap-2">
+					<FileImageIcon className="h-5 w-5 text-sky-700" />
+					<p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-700">
+						Modul Media
+					</p>
+				</div>
 				<h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
-					Media Upload Dasar
+					Media Library & Asset Upload
 				</h2>
-				<p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600 sm:text-base">
-					Upload gambar untuk konten homepage, potensi, sejarah, dan organisasi.
-					Data diambil langsung dari backend — sistem memvalidasi format gambar
-					dan ukuran file maksimal 2 MB.
+				<p className="mt-2 max-w-4xl text-sm leading-6 text-slate-600 sm:text-base">
+					Upload dan kelola berkas gambar untuk konten berita, potensi desa,
+					sejarah, dan organisasi. Gambar yang diunggah divalidasi langsung oleh
+					server (Maks. {formatFileSize(MEDIA_MAX_FILE_SIZE)}).
 				</p>
-				{notice ? (
-					<div className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-						{notice}
+
+				{notice && (
+					<div className="mt-4 flex items-center gap-2 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+						<Info className="h-4 w-4 flex-shrink-0 text-sky-600" />
+						<span>{notice}</span>
 					</div>
-				) : null}
+				)}
 			</section>
 
-			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-6">
-				<div className="flex flex-wrap items-center justify-between gap-3">
+			{/* Upload Section */}
+			<section className="rounded-[1.8rem] border border-white/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-7">
+				<div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-5">
 					<div>
 						<h3 className="text-xl font-semibold text-slate-900">
-							Unggah Gambar
+							Unggah Gambar Baru
 						</h3>
-						<p className="text-sm text-slate-600">
-							Format yang didukung: JPG, PNG, WEBP, SVG. Maksimal{" "}
+						<p className="mt-1 text-xs text-slate-500">
+							Format yang didukung: JPG, PNG, WEBP, SVG • Maksimal{" "}
 							{formatFileSize(MEDIA_MAX_FILE_SIZE)} per file.
 						</p>
 					</div>
+
 					<label
-						className={`inline-flex items-center rounded-full bg-gradient-to-r from-sky-600 to-blue-700 px-5 py-2.5 text-sm font-medium text-white transition hover:from-sky-700 hover:to-blue-800 ${isUploading ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}
+						className={`inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 px-5 py-2.5 text-sm font-medium text-white shadow transition hover:from-sky-700 hover:to-blue-800 active:scale-95 ${
+							isUploading ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+						}`}
 					>
-						{isUploading ? "Mengunggah..." : "Pilih File"}
+						{isUploading ? (
+							<RefreshCw className="h-4 w-4 animate-spin" />
+						) : (
+							<UploadCloud className="h-4 w-4" />
+						)}
+						<span>{isUploading ? "Mengunggah..." : "Pilih File Gambar"}</span>
 						<input
 							type="file"
 							accept="image/*"
 							multiple
 							className="hidden"
-							onChange={handleFiles}
+							onChange={(e) => void handleFiles(e)}
 							disabled={isUploading}
 						/>
 					</label>
 				</div>
 			</section>
 
-			<section className="rounded-[1.6rem] border border-white/70 bg-white/85 p-5 shadow-[0_24px_44px_-30px_rgba(15,23,42,0.35)] backdrop-blur lg:rounded-[2rem] lg:p-6">
-				<div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-					<h3 className="text-xl font-semibold text-slate-900">Daftar Media</h3>
+			{/* Media Gallery Section */}
+			<section className="rounded-[1.8rem] border border-white/80 bg-white/90 p-6 shadow-sm backdrop-blur sm:p-7">
+				<div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
 					<div className="flex items-center gap-2">
-						<input
-							type="search"
-							value={filter}
-							onChange={(event) => setFilter(event.target.value)}
-							placeholder="Cari nama file..."
-							className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none focus:border-sky-300"
-						/>
+						<FileImage className="h-5 w-5 text-sky-700" />
+						<h3 className="text-xl font-semibold text-slate-900">
+							Daftar Media
+						</h3>
+						<span className="ml-2 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+							{filteredItems.length} File
+						</span>
+					</div>
+
+					<div className="flex items-center gap-2">
+						{/* Search Filter */}
+						<div className="relative">
+							<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+							<input
+								type="search"
+								value={filter}
+								onChange={(event) => setFilter(event.target.value)}
+								placeholder="Cari nama file..."
+								className="h-10 rounded-xl border border-slate-200 bg-slate-50/80 pl-9 pr-3 text-sm text-slate-800 outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+							/>
+						</div>
+
+						{/* Refresh Button */}
 						<button
 							type="button"
 							onClick={() => void fetchMedia()}
 							disabled={isLoading}
-							className="h-10 rounded-lg border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+							className="inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 active:scale-95 disabled:opacity-50"
 						>
-							{isLoading ? "Memuat..." : "Refresh"}
+							<RefreshCw
+								className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+							/>
+							<span className="hidden sm:inline">
+								{isLoading ? "Memuat..." : "Refresh"}
+							</span>
 						</button>
 					</div>
 				</div>
 
+				{/* Grid Media Display */}
 				{filteredItems.length === 0 ? (
-					<div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
-						{isLoading ? "Memuat media..." : "Belum ada media tersimpan."}
+					<div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 p-10 text-center text-sm text-slate-500">
+						<FileImageIcon className="mb-2 h-10 w-10 text-slate-300" />
+						{isLoading ? (
+							<p>Memuat media library...</p>
+						) : filter ? (
+							<p>Tidak ditemukan media dengan kata kunci "{filter}".</p>
+						) : (
+							<p>
+								Belum ada media tersimpan. Silakan unggah berkas gambar pertama
+								Anda.
+							</p>
+						)}
 					</div>
 				) : (
-					<div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+					<div className="mt-6 grid gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
 						{filteredItems.map((item) => (
 							<article
 								key={item.id}
-								className="rounded-2xl border border-slate-200 bg-white p-3"
+								className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm transition hover:border-sky-300 hover:shadow-md"
 							>
-								<div className="relative h-36 w-full overflow-hidden rounded-xl border border-slate-200">
-									<Image
-										src={resolveMediaUrl(item.url)}
-										alt={item.fileName}
-										unoptimized
-										fill
-										className="object-cover"
-										sizes="(max-width: 1280px) 50vw, 33vw"
-									/>
+								<div>
+									{/* Image Container */}
+									<div className="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100">
+										<Image
+											src={resolveMediaUrl(item.url)}
+											alt={item.fileName}
+											unoptimized
+											fill
+											className="object-cover transition duration-300 group-hover:scale-105"
+											sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 25vw"
+										/>
+									</div>
+
+									{/* File Info */}
+									<div className="mt-3 space-y-1">
+										<p
+											className="line-clamp-1 text-sm font-semibold text-slate-900 group-hover:text-sky-700"
+											title={item.fileName}
+										>
+											{item.fileName}
+										</p>
+										<p className="text-xs text-slate-500">
+											{formatFileSize(item.sizeBytes)} •{" "}
+											{new Date(item.createdAt).toLocaleDateString("id-ID", {
+												day: "numeric",
+												month: "short",
+												year: "numeric",
+											})}
+										</p>
+									</div>
 								</div>
-								<p
-									className="mt-3 line-clamp-1 text-sm font-semibold text-slate-900"
-									title={item.fileName}
-								>
-									{item.fileName}
-								</p>
-								<p className="mt-1 text-xs text-slate-500">
-									{formatFileSize(item.sizeBytes)} •{" "}
-									{new Date(item.createdAt).toLocaleDateString("id-ID")}
-								</p>
-								<div className="mt-3 flex justify-end">
+
+								{/* Action Buttons */}
+								<div className="mt-4 flex items-center justify-between gap-2 border-t border-slate-100 pt-2.5">
+									<button
+										type="button"
+										onClick={() => handleCopyUrl(item.id, item.url)}
+										className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-sky-50 hover:text-sky-700 active:scale-95"
+										title="Salin URL Gambar"
+									>
+										{copiedId === item.id ? (
+											<Check className="h-3.5 w-3.5 text-emerald-600" />
+										) : (
+											<Copy className="h-3.5 w-3.5 text-slate-500" />
+										)}
+										<span>
+											{copiedId === item.id ? "Tersalin!" : "Salin URL"}
+										</span>
+									</button>
+
 									<button
 										type="button"
 										onClick={() => void removeItem(item.id, item.fileName)}
-										className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700"
+										className="inline-flex items-center gap-1 rounded-lg border border-rose-200 bg-rose-50 px-2.5 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 active:scale-95"
+										title="Hapus Media"
 									>
-										Hapus
+										<Trash2 className="h-3.5 w-3.5" />
+										<span>Hapus</span>
 									</button>
 								</div>
 							</article>
