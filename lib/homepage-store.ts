@@ -45,7 +45,7 @@ export const initialHomepageContent: HomepageContent = {
   heroTitle: 'Portal Informasi Resmi Desa Jadimulya',
   heroSubtitle:
     'Informasi desa yang terbarui, ringan diakses, dan relevan untuk warga, mitra, serta pemangku kepentingan.',
-  slogan: 'Desa Jadimulya anu lewih waluya',
+  slogan: 'Desa Jadimulya anu leuwih waluya',
   jelajahiLabel: 'Jelajahi Desa',
   jelajahiHref: '/potensi',
   logoKabupatenLabel: 'Kabupaten Pangandaran',

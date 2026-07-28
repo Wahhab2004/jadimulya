@@ -461,6 +461,8 @@ export default function AdminNewsPage() {
 									<Image
 										src={form.coverImage}
 										alt="Preview"
+										width={100}
+										height={64}
 										className="h-36 w-full rounded-lg object-cover"
 										onError={(e) => {
 											(e.target as HTMLElement).style.display = "none";

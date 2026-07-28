@@ -24,9 +24,6 @@ export type BackendOrganisasiItem = {
 	updatedAt: string;
 };
 
-// BARU — kategori potensi sekarang data dinamis (tabel PotentialCategory di
-// backend), bukan enum tetap PERTANIAN/PARIWISATA/UMKM lagi. GET /potensi
-// meng-include object kategori penuh lewat relasi Prisma di sisi backend.
 export type BackendPotensiCategory = {
 	id: string;
 	name: string;
@@ -196,8 +193,6 @@ export async function getPotensi(params?: {
 	return fetchApiData<BackendPotensiItem[]>(`/potensi${suffix}`);
 }
 
-// BARU — daftar kategori publik (hanya yang isPublic: true), dipakai untuk
-// membangun filter kategori secara dinamis di halaman katalog potensi.
 export async function getPotensiKategori() {
 	return fetchApiData<BackendPotensiCategory[]>("/potensi/kategori");
 }
