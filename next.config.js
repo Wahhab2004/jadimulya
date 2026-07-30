@@ -4,6 +4,10 @@ const apiBaseUrl =
 	process.env.NEXT_PUBLIC_API_BASE_URL ??
 	"http://localhost:4000/api/v1";
 
+const nextConfig = {
+	output: "standalone",
+};
+
 let backendOrigin = "http://localhost:4000";
 try {
 	backendOrigin = new URL(apiBaseUrl).origin;
@@ -12,23 +16,23 @@ try {
 }
 
 let backendImageHost = {
-	protocol: 'http',
-	hostname: 'localhost',
-	port: '4000',
+	protocol: "http",
+	hostname: "localhost",
+	port: "4000",
 };
 
 try {
 	const parsedBackend = new URL(backendOrigin);
 	backendImageHost = {
-		protocol: parsedBackend.protocol.replace(':', ''),
+		protocol: parsedBackend.protocol.replace(":", ""),
 		hostname: parsedBackend.hostname,
 		port: parsedBackend.port,
 	};
 } catch {
 	backendImageHost = {
-		protocol: 'http',
-		hostname: 'localhost',
-		port: '4000',
+		protocol: "http",
+		hostname: "localhost",
+		port: "4000",
 	};
 }
 
@@ -40,13 +44,13 @@ const nextConfig = {
 				protocol: backendImageHost.protocol,
 				hostname: backendImageHost.hostname,
 				port: backendImageHost.port,
-				pathname: '/uploads/**',
+				pathname: "/uploads/**",
 			},
 			{
-				protocol: 'http',
-				hostname: 'localhost',
-				port: '3000',
-				pathname: '/uploads/**',
+				protocol: "http",
+				hostname: "localhost",
+				port: "3000",
+				pathname: "/uploads/**",
 			},
 		],
 	},
