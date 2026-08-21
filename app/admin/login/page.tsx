@@ -152,7 +152,7 @@ export default function AdminLoginPage({ searchParams }: AdminLoginPageProps) {
 				<span className="font-semibold text-slate-800">
 					admin@jadimulya.desa.id
 				</span>{" "}
-				/ <span className="font-semibold text-slate-800">Jadimulya.</span>
+				/ <span className="font-semibold text-slate-800">Jadimulya123!</span>
 			</div>
 		</section>
 	);
