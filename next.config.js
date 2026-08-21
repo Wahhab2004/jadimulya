@@ -4,7 +4,6 @@ const apiBaseUrl =
 	process.env.NEXT_PUBLIC_API_BASE_URL ??
 	"http://localhost:4000/api/v1";
 
-
 let backendOrigin = "http://localhost:4000";
 try {
 	backendOrigin = new URL(apiBaseUrl).origin;
@@ -45,10 +44,9 @@ const nextConfig = {
 				pathname: "/uploads/**",
 			},
 			{
-				protocol: "http",
-				hostname: "localhost",
-				port: "3000",
-				pathname: "/uploads/**",
+				protocol: "https",
+				hostname: "api.jadimulya-pangandaran.id",
+				pathname: "/**",
 			},
 		],
 	},
@@ -57,11 +55,6 @@ const nextConfig = {
 			{
 				source: "/uploads/:path*",
 				destination: `${backendOrigin}/uploads/:path*`,
-			},
-
-			{
-				source: "/uploads/:path*",
-				destination: `http://localhost:3000/uploads/:path*`,
 			},
 		];
 	},
