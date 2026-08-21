@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { HeroSlide, HomepageStat } from "@/lib/homepage-store";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 type HeroSectionProps = {
 	title: string;
@@ -66,8 +67,9 @@ export default function HeroSection({
 								}`}
 							>
 								<Image
-									src={slide.imageUrl}
+									 src={resolveMediaUrl(slide.imageUrl)}
 									alt={slide.caption || title}
+									unoptimized
 									fill
 									priority={index === 0}
 									className="object-cover contrast-105 saturate-[0.9]"
@@ -161,7 +163,7 @@ export default function HeroSection({
 						<div className="mt-8 inline-flex items-center gap-3.5 rounded-2xl border border-white/15 bg-slate-900/40 p-2.5 pr-5 backdrop-blur-md">
 							{logoKabupatenImageUrl ? (
 								<Image
-									src={logoKabupatenImageUrl}
+									src={resolveMediaUrl(logoKabupatenImageUrl)}
 									alt={logoKabupatenLabel}
 									width={40}
 									height={40}

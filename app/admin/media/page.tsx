@@ -22,7 +22,8 @@ import {
 	saveMediaItems,
 } from "@/lib/media-store";
 import { showAdminToast } from "@/lib/admin-toast";
-import { adminBeFetch, buildAdminBeUrl } from "@/lib/admin-api-client";
+import { adminBeFetch } from "@/lib/admin-api-client";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 type MediaItem = {
@@ -41,28 +42,6 @@ type BackendResponse<T> = {
 };
 
 // ─── Constants & Helpers ────────────────────────────────────────────────────
-const BACKEND_ORIGIN = process.env.NEXT_PUBLIC_BACKEND_URL ?? "";
-const API_BASE_ORIGIN = (() => {
-	try {
-		return new URL(buildAdminBeUrl("")).origin;
-	} catch {
-		return "";
-	}
-})();
-
-function resolveMediaUrl(url: string) {
-	if (/^https?:\/\//i.test(url)) return url;
-	if (url.startsWith("/")) {
-		return url;
-	}
-	const origin = BACKEND_ORIGIN || API_BASE_ORIGIN;
-	if (!origin) {
-		return url;
-	}
-	const normalizedPath = url.startsWith("/") ? url : `/${url}`;
-	return `${origin}${normalizedPath}`;
-}
-
 function formatFileSize(bytes: number) {
 	if (bytes < 1024) {
 		return `${bytes} B`;
@@ -95,6 +74,7 @@ export default function AdminMediaPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isUploading, setIsUploading] = useState(false);
 	const [copiedId, setCopiedId] = useState<string | null>(null);
+	const [failedPreviewIds, setFailedPreviewIds] = useState<string[]>([]);
 
 	useEffect(() => {
 		void fetchMedia();
@@ -106,6 +86,7 @@ export default function AdminMediaPage() {
 			const data = await apiFetch<MediaItem[]>("media");
 			const nextItems = Array.isArray(data) ? data : [];
 			setItems(nextItems);
+			setFailedPreviewIds([]);
 			saveMediaItems(
 				nextItems.map((item) => ({
 					id: item.id,
@@ -352,14 +333,21 @@ export default function AdminMediaPage() {
 								<div>
 									{/* Image Container */}
 									<div className="relative h-40 w-full overflow-hidden rounded-xl bg-slate-100">
-										<Image
-											src={resolveMediaUrl(item.url)}
-											alt={item.fileName}
-											unoptimized
-											fill
-											className="object-cover transition duration-300 group-hover:scale-105"
-											sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 25vw"
-										/>
+										{failedPreviewIds.includes(item.id) ? (
+											<div className="flex h-full items-center justify-center px-4 text-center text-xs text-rose-600">
+												Preview gagal dimuat
+											</div>
+										) : (
+											<Image
+												src={resolveMediaUrl(item.url)}
+												alt={item.fileName}
+												unoptimized
+												fill
+												className="object-cover transition duration-300 group-hover:scale-105"
+												sizes="(max-width: 640px) 100vw, (max-width: 1280px) 33vw, 25vw"
+												onError={() => setFailedPreviewIds((current) => [...current, item.id])}
+											/>
+										)}
 									</div>
 
 									{/* File Info */}

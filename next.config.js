@@ -44,6 +44,18 @@ const nextConfig = {
 				pathname: "/uploads/**",
 			},
 			{
+				protocol: backendImageHost.protocol,
+				hostname: backendImageHost.hostname,
+				port: backendImageHost.port,
+				pathname: "/storage/**",
+			},
+			{
+				protocol: backendImageHost.protocol,
+				hostname: backendImageHost.hostname,
+				port: backendImageHost.port,
+				pathname: "/api/v1/uploads/**",
+			},
+			{
 				protocol: "https",
 				hostname: "api.jadimulya-pangandaran.id",
 				pathname: "/**",

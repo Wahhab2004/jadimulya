@@ -1,4 +1,5 @@
-import Image from 'next/image';
+import Image from "next/image";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 type OrgMemberCardProps = {
   name: string;
@@ -6,14 +7,27 @@ type OrgMemberCardProps = {
   photoUrl?: string;
 };
 
-export default function OrgMemberCard({ name, position, photoUrl }: OrgMemberCardProps) {
+export default function OrgMemberCard({
+  name,
+  position,
+  photoUrl,
+}: OrgMemberCardProps) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-5 text-center shadow-sm">
       <div className="mx-auto mb-4 h-24 w-24 overflow-hidden rounded-full bg-slate-100">
         {photoUrl ? (
-          <Image src={photoUrl} alt={name} width={96} height={96} className="h-full w-full object-cover" />
+          <Image
+            src={resolveMediaUrl(photoUrl)}
+            alt={name}
+            unoptimized
+            width={96}
+            height={96}
+            className="h-full w-full object-cover"
+          />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">Foto</div>
+          <div className="flex h-full items-center justify-center text-slate-400">
+            Foto
+          </div>
         )}
       </div>
       <p className="font-semibold text-slate-900">{name}</p>

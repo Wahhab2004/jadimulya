@@ -1,4 +1,5 @@
-import Image from 'next/image';
+import Image from "next/image";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 type NewsCardProps = {
   tag: string;
@@ -8,14 +9,29 @@ type NewsCardProps = {
   imageUrl: string;
 };
 
-export default function NewsCard({ tag, title, date, description, imageUrl }: NewsCardProps) {
+export default function NewsCard({
+  tag,
+  title,
+  date,
+  description,
+  imageUrl,
+}: NewsCardProps) {
   return (
     <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
       <div className="relative h-56 overflow-hidden bg-slate-100">
         {imageUrl ? (
-          <Image src={imageUrl} alt={title} fill className="object-cover transition duration-500 hover:scale-105" sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw" />
+          <Image
+            src={resolveMediaUrl(imageUrl)}
+            alt={title}
+            fill
+            unoptimized
+            className="object-cover transition duration-500 hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+          />
         ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No Image</div>
+          <div className="flex h-full items-center justify-center text-slate-400">
+            No Image
+          </div>
         )}
         <span className="absolute left-4 top-4 inline-flex rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.25em] text-slate-900 shadow-sm">
           {tag}

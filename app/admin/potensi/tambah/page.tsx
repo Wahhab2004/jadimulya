@@ -8,6 +8,8 @@ import AdminPotensiForm, {
 } from "@/app/components/AdminPotensiForm";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
+import { buildAdminBeUrl } from "@/lib/admin-api-client";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 const emptyForm: AdminPotensiFormState = {
 	name: "",
@@ -24,15 +26,13 @@ function normalizeUrl(value: string) {
 		return undefined;
 	}
 
-	if (trimmed.startsWith("/")) {
-		if (typeof window !== "undefined") {
-			return new URL(trimmed, window.location.origin).toString();
-		}
-		return undefined;
+	const resolvedValue = resolveMediaUrl(trimmed);
+	if (resolvedValue.startsWith("/")) {
+		return new URL(resolvedValue, new URL(buildAdminBeUrl("")).origin).toString();
 	}
 
 	try {
-		return new URL(trimmed).toString();
+		return new URL(resolvedValue).toString();
 	} catch {
 		return undefined;
 	}

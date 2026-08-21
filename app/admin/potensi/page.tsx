@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 type PotensiItem = {
 	id: string;
@@ -604,9 +605,10 @@ export default function AdminPotensiPage() {
 
 										<div className="relative h-20 w-full sm:w-28 shrink-0 overflow-hidden rounded-xl bg-slate-100 border border-slate-100">
 											<Image
-												src={item.imageUrl}
+												src={resolveMediaUrl(item.imageUrl)}
 												alt={item.title}
 												fill
+												unoptimized	
 												className="object-cover transition-transform duration-300 group-hover:scale-105"
 												sizes="(max-width: 640px) 100vw, 112px"
 											/>

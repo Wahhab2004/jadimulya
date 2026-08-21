@@ -8,6 +8,7 @@ import {
 	type MediaItem,
 } from "@/lib/media-store";
 import { adminBeFetch } from "@/lib/admin-api-client";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 // BARU — kategori potensi sekarang data dinamis (tabel PotentialCategory di
 // backend), bukan enum tetap PERTANIAN/PARIWISATA lagi. Form ini sekarang

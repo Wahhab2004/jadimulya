@@ -17,6 +17,7 @@ import {
 	type BackendPotensiCategory,
 } from "@/lib/api";
 import { downloadPotensiCatalogPdf } from "@/lib/potensi-catalog-pdf";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 const SEMUA_POTENSI = "Semua Potensi";
 
@@ -189,9 +190,10 @@ export default function PotensiPage() {
 								<div className="grid lg:grid-cols-12 items-center gap-0">
 									<div className="relative h-64 sm:h-80 lg:h-[380px] lg:col-span-7 overflow-hidden bg-slate-100">
 										<Image
-											src={highlightItem.imageUrl}
+											src={resolveMediaUrl(highlightItem.imageUrl)}
 											alt={highlightItem.title}
 											fill
+											unoptimized
 											className="object-cover transition duration-500 hover:scale-105"
 											priority
 											sizes="(max-width: 1024px) 100vw, 60vw"
@@ -275,7 +277,7 @@ export default function PotensiPage() {
 								{/* Foto Sampul */}
 								<div className="relative h-56 w-full overflow-hidden bg-slate-100">
 									<Image
-										src={item.imageUrl}
+										src={resolveMediaUrl(item.imageUrl)}
 										alt={item.title}
 										fill
 										className="object-cover transition duration-500 group-hover:scale-105"

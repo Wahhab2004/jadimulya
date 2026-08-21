@@ -11,6 +11,7 @@ import {
   type MediaItem,
 } from '@/lib/media-store';
 import { showAdminToast } from '@/lib/admin-toast';
+import { resolveMediaUrl } from '@/lib/media-url';
 
 const emptyMilestone: SejarahMilestone = { year: '', event: '', imageUrl: '' };
 
@@ -173,7 +174,7 @@ export default function AdminSejarahMilestonePage() {
                     <p className="mt-1 text-sm leading-6 text-slate-700">{item.event}</p>
                     {item.imageUrl ? (
                       <div className="relative mt-3 h-20 w-28 overflow-hidden rounded-xl border border-slate-200">
-                        <Image src={item.imageUrl} alt={`Foto milestone ${item.year}`} fill className="object-cover" sizes="112px" />
+                        <Image src={resolveMediaUrl(item.imageUrl)} alt={`Foto milestone ${item.year}`} fill className="object-cover" sizes="112px" />
                       </div>
                     ) : null}
                   </div>

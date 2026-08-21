@@ -11,6 +11,7 @@ import {
 	type SejarahContent,
 } from "@/lib/sejarah-store";
 import { getSejarahMilestone, getSejarahNarasi } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 const daftarIsi = [
 	{ id: "asal-usul", label: "Asal-usul Desa" },
@@ -381,8 +382,9 @@ export default function SejarahPage() {
 										{item.imageUrl ? (
 											<div className="relative mt-4 h-44 w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-100">
 												<Image
-													src={item.imageUrl}
+													src={resolveMediaUrl(item.imageUrl)}
 													alt={`Foto peristiwa ${item.year}`}
+													unoptimized
 													fill
 													className="object-cover transition duration-300 hover:scale-105"
 													sizes="(max-width: 768px) 100vw, 50vw"

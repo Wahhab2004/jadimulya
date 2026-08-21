@@ -9,6 +9,7 @@ import {
 	type OrganisasiMember,
 } from "@/lib/organisasi-store";
 import { getOrganisasi, type BackendOrganisasiItem } from "@/lib/api";
+import { resolveMediaUrl } from "@/lib/media-url";
 
 function mapTierToGroup(item: BackendOrganisasiItem): OrganisasiGroup {
 	if (item.tier === "KEPALA_DESA") {
@@ -99,8 +100,9 @@ function MemberCard({
 			{/* Background Foto Profil */}
 			{member.photoUrl ? (
 				<Image
-					src={member.photoUrl}
+					src={resolveMediaUrl(member.photoUrl)}
 					alt={member.name}
+					unoptimized
 					fill
 					className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
 					sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"

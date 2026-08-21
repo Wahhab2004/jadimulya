@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { showAdminToast } from "@/lib/admin-toast";
 import { adminBeFetch } from "@/lib/admin-api-client";
+import { buildAdminBeUrl } from "@/lib/admin-api-client";
+import { resolveMediaUrl } from "@/lib/media-url";
 import {
 	loadRemoteMediaItems,
 	loadStoredMediaItems,
@@ -92,15 +94,13 @@ function normalizeUrl(value: string) {
 	const trimmed = value.trim();
 	if (!trimmed) return undefined;
 
-	if (trimmed.startsWith("/")) {
-		if (typeof window !== "undefined") {
-			return new URL(trimmed, window.location.origin).toString();
-		}
-		return undefined;
+	const resolvedValue = resolveMediaUrl(trimmed);
+	if (resolvedValue.startsWith("/")) {
+		return new URL(resolvedValue, new URL(buildAdminBeUrl("")).origin).toString();
 	}
 
 	try {
-		return new URL(trimmed).toString();
+		return new URL(resolvedValue).toString();
 	} catch {
 		return undefined;
 	}
@@ -459,8 +459,9 @@ export default function AdminNewsPage() {
 										Preview Cover:
 									</p>
 									<Image
-										src={form.coverImage}
+										src={resolveMediaUrl(form.coverImage)}
 										alt="Preview"
+										unoptimized
 										width={100}
 										height={64}
 										className="h-36 w-full rounded-lg object-cover"
@@ -613,8 +614,9 @@ export default function AdminNewsPage() {
 										<div className="flex items-start gap-3">
 											{item.coverImage ? (
 												<Image
-													src={item.coverImage}
+													src={resolveMediaUrl(item.coverImage)}
 													alt={item.title}
+													unoptimized
 													className="h-16 w-16 flex-shrink-0 rounded-xl object-cover"
 													onError={(e) => {
 														(e.target as HTMLElement).style.display = "none";
