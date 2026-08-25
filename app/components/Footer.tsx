@@ -168,7 +168,7 @@ export default function Footer() {
               href="/kebijakan-privasi"
               className="transition hover:text-slate-300"
             >
-              Privasi
+              Privasi 2
             </Link>
             <Link
               href="/syarat-ketentuan"
